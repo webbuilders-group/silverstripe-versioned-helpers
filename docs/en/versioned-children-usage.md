@@ -92,6 +92,15 @@ VersionedChildrenExtension:
 ```
 
 
+## Non-SiteTree Version Objects
+Note that ``SiteTree`` defines ``doPublish``, ``doUnpublish``, ``doRevertToLive`` and ``doRollback`` methods these methods call corresponding "onAfter" extension points. If you have your own versioned ``DataObject`` descendent you must ensure that you have methods that call the following extension points for the appropriate actions. If you do not then the ``VersionedChildrenExtension`` will not work as expected since it is not called.
+
+* __onAfterPublish:__ This should be called after the object is published.
+* __onAfterUnpublish:__ This should be called after the object is unpublished.
+* __onAfterRevertToLive:__ This should be called after the object has been reverted to live.
+* __onAfterRollback:__ This should be called after the object has been rolled back to a given version number. There is a config variable ``VersionedChildrenExtension.archived_error_margin`` that governs the window for looking up the history as mentioned above.
+
+
 ## User Experience Recommendation
 It's recommended that you display the modified and published status in your GridField for managing the child objects. To do this add the ``IsModifiedOnStage`` and ``ExistsOnLive`` "fields" to your summary fields. You should probably also cast them to ``Boolean->Nice`` so you get a friendly Yes/No for the user rather than 1 and an empty column. For example:
 
