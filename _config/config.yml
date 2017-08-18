@@ -1,0 +1,8 @@
+---
+Name: versioned_helpers
+After:
+    - "framework/*"
+---
+#MyDataObject:
+#    extensions:
+#        - "VersionedSupportExtension"
