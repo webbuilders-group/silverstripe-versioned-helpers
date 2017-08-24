@@ -11,6 +11,9 @@ class VersionedModifiedExtension extends DataExtension {
                                 'IsPublished'=>'Boolean'
                             );
     
+    private $_originalOwnerClass=false;
+    
+    
     /**
      * Constructor
      * @param string $relationship ... Names of the has_many relationships to sync the version state (Overloaded)
@@ -22,6 +25,36 @@ class VersionedModifiedExtension extends DataExtension {
     }
     
     /**
+	 * Set the owner of this extension.
+	 * @param Object $owner The owner object
+	 * @param string $ownerBaseClass The base class that the extension is applied to; this may be the class of owner, or it may be a parent
+	 */
+    public function setOwner($owner, $ownerBaseClass=null) {
+        parent::setOwner($owner, $ownerBaseClass);
+        
+        //In dev mode do validation of the relations
+        if(Director::isDev() && $this->owner instanceof DataObject && $this->_originalOwnerClass===false) {
+            $this->_originalOwnerClass=$this->owner->ClassName;
+            
+            if($this->_originalOwnerClass!=$this->owner->ClassName) {
+                return;
+            }
+            
+            foreach($this->_relations as $relation) {
+                $relClass=$this->owner->hasMany($relation);
+                if(!$relClass) {
+                    user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                }
+            
+                $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
+                if(!$parentField) {
+                    user_error('Could not find the parent relationship on has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                }
+            }
+        }
+    }
+    
+    /**
      * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
      * @param bool $modified Whether or not the parent is modified or not
      */
@@ -30,12 +63,12 @@ class VersionedModifiedExtension extends DataExtension {
             foreach($this->_relations as $relation) {
                 $relClass=$this->owner->hasMany($relation);
                 if(!$relClass) {
-                    user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
                 if(!$parentField) {
-                    user_error('Could not find the parent relationship on has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 //Make sure the Items all exist on both stages
@@ -113,14 +146,14 @@ class VersionedModifiedExtension extends DataExtension {
             foreach($this->_relations as $relation) {
                 $relClass=$this->owner->hasMany($relation);
                 if(!$relClass) {
-                    user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 $baseClass=ClassInfo::baseDataClass($relClass);
                 
                 $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
                 if(!$parentField) {
-                    user_error('Could not find the parent relationship on has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 //Make sure the Items all exist on both stages

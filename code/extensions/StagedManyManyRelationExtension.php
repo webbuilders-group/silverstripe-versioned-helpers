@@ -7,6 +7,8 @@ class StagedManyManyRelationExtension extends DataExtension {
     protected $_relations=array();
     protected $_joinTables=array();
     
+    private $_originalOwnerClass=false;
+    
     
     /**
      * Constructor
@@ -28,6 +30,30 @@ class StagedManyManyRelationExtension extends DataExtension {
         
         if($this->owner instanceof DataObject) {
             $this->_joinTables=array_map(array($this, 'concatOwnerTable'), $this->_relations);
+            
+            
+            //In dev mode do validation of the relations
+            if(Director::isDev() && $this->_originalOwnerClass===false) {
+                $this->_originalOwnerClass=$this->owner->ClassName;
+                
+                if($this->_originalOwnerClass!=$this->owner->ClassName) {
+                    return;
+                }
+                
+                foreach($this->_relations as $relation) {
+                    $relationLive=$relation.'_Live';
+            
+                    $relClass=$this->owner->manyMany($relation);
+                    if(!$relClass) {
+                        user_error('Could not find the many_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    }
+            
+                    $relLiveClass=$this->owner->manyMany($relationLive);
+                    if(!$relLiveClass || $relClass[1]!=$relLiveClass[1]) {
+                        user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$this->owner->class.'" or the class does not match.', E_USER_ERROR);
+                    }
+                }
+            }
         }
     }
     
@@ -42,12 +68,12 @@ class StagedManyManyRelationExtension extends DataExtension {
                 
                 $relClass=$this->owner->manyMany($relation);
                 if(!$relClass) {
-                    user_error('Could not find the many_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 $relLiveClass=$this->owner->manyMany($relationLive);
                 if(!$relLiveClass || $relClass[1]!=$relLiveClass[1]) {
-                    user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$this->owner->class.'" or the class does not match.', E_USER_ERROR);
+                    continue;
                 }
                 
                 //Make sure the Items all exist on both stages

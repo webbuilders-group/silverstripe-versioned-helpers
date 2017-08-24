@@ -19,12 +19,12 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
         foreach($this->_relations as $relation) {
             $relClass=$this->owner->hasMany($relation);
             if(!$relClass) {
-                user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                continue;
             }
             
             $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
             if(!$parentField) {
-                user_error('Could not find the parent relationship on has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                continue;
             }
         
             if($this->owner->$relation()->count()>0) {
@@ -64,7 +64,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
         foreach($this->_relations as $relation) {
             $relClass=$this->owner->hasMany($relation);
             if(!$relClass) {
-                user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                continue;
             }
             
             if($this->owner->$relation()->count()>0) {
@@ -94,7 +94,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
         foreach($this->_relations as $relation) {
             $relClass=$this->owner->hasMany($relation);
             if(!$relClass) {
-                user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                continue;
             }
             
             
@@ -157,7 +157,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
             foreach($this->_relations as $relation) {
                 $relClass=$this->owner->hasMany($relation);
                 if(!$relClass) {
-                    user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 //Publish all live questions to the staging site
@@ -208,12 +208,12 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
             foreach($this->_relations as $relation) {
                 $relClass=$this->owner->hasMany($relation);
                 if(!$relClass) {
-                    user_error('Could not find the has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
                 if(!$parentField) {
-                    user_error('Could not find the parent relationship on has_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
+                    continue;
                 }
                 
                 //Remove all stage items
