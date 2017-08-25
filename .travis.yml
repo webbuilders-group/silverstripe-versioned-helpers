@@ -20,4 +20,4 @@ before_script:
  - cd ~/builds/ss
 
 script:
- - phpunit silverstripe-versioned-helper/tests/
+ - phpunit silverstripe-versioned-helpers/tests/
