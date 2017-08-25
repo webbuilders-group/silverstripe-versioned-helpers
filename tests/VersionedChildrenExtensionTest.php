@@ -83,10 +83,10 @@ class VersionedChildrenExtensionTest extends SapphireTest {
         
         
         //Because tests run quickly we need to back the LastEdited field up a few minutes otherwise we won't be able to accurately rollback
-        DB::prepared_query('UPDATE "VersionedChildrenTestObj" SET "LastEdited"=DATE_SUB("LastEdited", INTERVAL 10 MINUTE) WHERE "ID"= ?', array($obj->ID));
-        DB::prepared_query('UPDATE "VersionedChildrenTestObj_versions" SET "LastEdited"=DATE_SUB("LastEdited", INTERVAL 10 MINUTE) WHERE "RecordID"= ?', array($obj->ID));
-        DB::prepared_query('UPDATE "VersionedChildrenTestSubObj" SET "LastEdited"=DATE_SUB("LastEdited", INTERVAL 10 MINUTE) WHERE "ParentID"= ?', array($obj->ID));
-        DB::prepared_query('UPDATE "VersionedChildrenTestSubObj_versions" SET "LastEdited"=DATE_SUB("LastEdited", INTERVAL 10 MINUTE) WHERE "ParentID"= ?', array($obj->ID));
+        DB::prepared_query('UPDATE "VersionedChildrenTestObj" SET "LastEdited"=\''.date('Y-m-d H:i:s', strtotime('-10 minutes')).'\' WHERE "ID"= ?', array($obj->ID));
+        DB::prepared_query('UPDATE "VersionedChildrenTestObj_versions" SET "LastEdited"=\''.date('Y-m-d H:i:s', strtotime('-10 minutes')).'\' WHERE "RecordID"= ?', array($obj->ID));
+        DB::prepared_query('UPDATE "VersionedChildrenTestSubObj" SET "LastEdited"=\''.date('Y-m-d H:i:s', strtotime('-10 minutes')).'\' WHERE "ParentID"= ?', array($obj->ID));
+        DB::prepared_query('UPDATE "VersionedChildrenTestSubObj_versions" SET "LastEdited"=\''.date('Y-m-d H:i:s', strtotime('-10 minutes')).'\' WHERE "ParentID"= ?', array($obj->ID));
         
         
         //Get the current version number
@@ -146,7 +146,7 @@ class VersionedChildrenTestObj extends DataObject implements TestOnly {
     
     
     public function doPublish() {
-        $original=Versioned::get_one_by_stage("SiteTree", "Live", array('"SiteTree"."ID"'=>$this->ID));
+        $original=Versioned::get_one_by_stage("VersionedChildrenTestObj", "Live", array('"VersionedChildrenTestObj"."ID"'=>$this->ID));
         if(!$original) {
             $original=new SiteTree();
         }
