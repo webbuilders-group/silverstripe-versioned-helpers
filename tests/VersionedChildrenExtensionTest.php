@@ -148,7 +148,7 @@ class VersionedChildrenTestObj extends DataObject implements TestOnly {
     public function doPublish() {
         $original=Versioned::get_one_by_stage("VersionedChildrenTestObj", "Live", array('"VersionedChildrenTestObj"."ID"'=>$this->ID));
         if(!$original) {
-            $original=new SiteTree();
+            $original=new VersionedChildrenTestObj();
         }
         
         $this->invokeWithExtensions('onBeforePublish', $original);
