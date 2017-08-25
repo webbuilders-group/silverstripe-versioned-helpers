@@ -1,7 +1,9 @@
 Staged Many_Many Relation Extension Usage
 =================
-The ``StagedManyManyRelationExtension`` extension allows you to have a draft a live state for a ``many_many`` relationship. It's pretty simple to implement, like most of the other extensions in this module you must pass the relationships into the extension. However you must also ensure that you add a copy of the relationship with the suffix ``_Live``. You do not need any of the other extensions in this module to use this extension however it will work with them. For example:
+The ``StagedManyManyRelationExtension`` extension allows you to have a draft a live state for a ``many_many`` relationship. It's pretty simple to implement, like most of the other extensions in this module you must pass the relationships into the extension. However you must also ensure that you add a copy of the relationship with the suffix ``_Live``. You do not need any of the other extensions in this module to use this extension however it will work with them. In both your PHP code and your template code you simply reference the draft relationship (in the example below this would be ``Images``) and not the live relationship (in the example below this would be ``Images_Live``).
 
+
+Implementation Example:
 ```php
 <?php
 class MyDataObject extends DataObject {

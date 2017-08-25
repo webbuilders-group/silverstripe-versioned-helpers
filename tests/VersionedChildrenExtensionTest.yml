@@ -1,0 +1,24 @@
+VersionedChildrenTestObj:
+    item1:
+        Title: "Test Object 1"
+    item2:
+        Title: "Test Object 2"
+    item3:
+        Title: "Test Object 3"
+    item4:
+        Title: "Test Object 4"
+
+
+VersionedChildrenTestSubObj:
+    sub1:
+        Title: "Sub Object 1"
+        Parent: =>VersionedChildrenTestObj.item1
+    sub2:
+        Title: "Sub Object 2"
+        Parent: =>VersionedChildrenTestObj.item2
+    sub3:
+        Title: "Sub Object 3"
+        Parent: =>VersionedChildrenTestObj.item3
+    sub4:
+        Title: "Sub Object 4"
+        Parent: =>VersionedChildrenTestObj.item4

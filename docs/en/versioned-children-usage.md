@@ -98,7 +98,6 @@ Note that ``SiteTree`` defines ``doPublish``, ``doUnpublish``, ``doRevertToLive`
 * __onAfterPublish:__ This should be called after the object is published.
 * __onAfterUnpublish:__ This should be called after the object is unpublished.
 * __onAfterRevertToLive:__ This should be called after the object has been reverted to live.
-* __onAfterRollback:__ This should be called after the object has been rolled back to a given version number. There is a config variable ``VersionedChildrenExtension.archived_error_margin`` that governs the window for looking up the history as mentioned above.
 
 
 ## User Experience Recommendation
