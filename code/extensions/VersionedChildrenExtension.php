@@ -240,6 +240,26 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
     }
     
     /**
+     * Delete all items on the relationship after deleting
+     */
+    public function onAfterDelete() {
+        parent::onAfterDelete();
+        
+        foreach($this->_relations as $relation) {
+            $relClass=$this->owner->hasMany($relation);
+            if(!$relClass) {
+                continue;
+            }
+            
+            if($this->owner->$relation()->count()>0) {
+                foreach($this->owner->$relation() as $item) {
+                    $item->delete();
+                }
+            }
+        }
+    }
+    
+    /**
      * Gets the latest items at the head of the versions for the parent object
      * @param string $relation Name of the relationship
      * @param string $baseClassName Base Class Name of the relationship object
