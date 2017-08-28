@@ -7,6 +7,8 @@ class StagedManyManyRelationExtension extends DataExtension {
     protected $_relations=array();
     protected $_joinTables=array();
     
+    private static $disabled=false;
+    
     private $_originalOwnerClass=false;
     
     
@@ -62,6 +64,8 @@ class StagedManyManyRelationExtension extends DataExtension {
      * @param bool $modified Whether or not the parent is modified or not
      */
     public function getIsModifiedOnStage(&$modified=false) {
+        self::$disabled=true;
+        
         if(!$modified) {
             foreach($this->_relations as $relation) {
                 $relationLive=$relation.'_Live';
@@ -88,6 +92,9 @@ class StagedManyManyRelationExtension extends DataExtension {
             }
         }
         
+        
+        self::$disabled=false;
+        
         return $modified;
     }
     
@@ -97,10 +104,14 @@ class StagedManyManyRelationExtension extends DataExtension {
      * @param string $stage2
      */
     public function stagesDiffer($stage1, $stage2) {
+        self::$disabled=true;
+        
         $table1=$this->baseTable($stage1);
         $table2=$this->baseTable($stage2);
         
         if(!is_numeric($this->owner->ID)) {
+            self::$disabled=false;
+            
             return true;
         }
         
@@ -145,6 +156,8 @@ class StagedManyManyRelationExtension extends DataExtension {
             }
         }
         
+        self::$disabled=false;
+        
         return !$stagesAreEqual;
     }
     
@@ -153,7 +166,7 @@ class StagedManyManyRelationExtension extends DataExtension {
      * @param ManyManyList $list Many Many List to replace
      */
     public function updateManyManyComponents(ManyManyList &$list) {
-        if(Versioned::current_stage()=='Live' && in_array($list->getJoinTable(), $this->_joinTables)) {
+        if(self::$disabled==false && Versioned::current_stage()=='Live' && in_array($list->getJoinTable(), $this->_joinTables)) {
             $list=ManyManyList::create($list->dataClass(), $list->getJoinTable().'_Live', $list->getLocalKey(), $list->getForeignKey(), $list->getExtraFields());
         }
     }
@@ -165,8 +178,15 @@ class StagedManyManyRelationExtension extends DataExtension {
      * @param bool $createNewVersion Whether to create a new version or not
      */
     public function onBeforeVersionedPublish($fromStage, $toStage, $createNewVersion) {
+        self::$disabled=true;
+        
         foreach($this->_relations as $relName) {
             $relLiveName=$relName.'_Live';
+            
+            $relClass=$this->owner->manyMany($relLiveName);
+            if(!$relClass) {
+                continue;
+            }
             
             if($fromStage=='Stage' && $toStage=='Live') {
                 $this->owner->$relLiveName()->removeAll();
@@ -188,6 +208,29 @@ class StagedManyManyRelationExtension extends DataExtension {
                 }
             }
         }
+        
+        self::$disabled=false;
+    }
+    
+    /**
+     * Removes the items from the live relationship after unpublishing
+     */
+    public function onAfterUnpublish() {
+        self::$disabled=true;
+        
+        foreach($this->_relations as $relation) {
+            $relLiveName=$relation.'_Live';
+            
+            $relClass=$this->owner->manyMany($relLiveName);
+            if(!$relClass) {
+                continue;
+            }
+            
+            //Remove all from this relationship
+            $this->owner->$relLiveName()->removeAll();
+        }
+        
+        self::$disabled=false;
     }
     
     /**

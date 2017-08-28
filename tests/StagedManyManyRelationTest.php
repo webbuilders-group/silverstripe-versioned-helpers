@@ -61,6 +61,35 @@ class StagedManyManyRelationTest extends SapphireTest {
     }
     
     /**
+     * Test Unpublishing
+     */
+    public function testUnpublish() {
+        $obj=$this->objFromFixture('StagedManyManyTestObj', 'item2');
+        $obj->publish('Stage', 'Live');
+        
+        
+        //Make sure the items exist on live
+        Versioned::reading_stage('Live');
+        $this->assertEquals(1, Versioned::get_by_stage('StagedManyManyTestObj', 'Live')->filter('ID', $obj->ID)->count());
+        $this->assertEquals(1, $obj->SubObjs()->count());
+        Versioned::reading_stage('Stage');
+        
+        
+        $this->assertTrue($obj->doUnpublish());
+        
+        
+        //Make sure the items do not exist on live
+        Versioned::reading_stage('Live');
+        $this->assertEquals(0, Versioned::get_by_stage('StagedManyManyTestObj', 'Live')->filter('ID', $obj->ID)->count());
+        $this->assertEquals(0, $obj->SubObjs()->count());
+        Versioned::reading_stage('Stage');
+        
+        
+        //Make sure stage does still have items
+        $this->assertEquals(1, $obj->SubObjs()->count());
+    }
+    
+    /**
      * Test IsModifiedOnStage
      */
     public function testIsModifiedOnStage() {
@@ -121,6 +150,37 @@ class StagedManyManyTestObj extends DataObject implements TestOnly {
                                     'Versioned',
                                     "StagedManyManyRelationExtension('SubObjs')"
                                 );
+    
+    /**
+     * Unpublish this page - remove it from the live site
+     *
+     * @uses SiteTreeExtension->onBeforeUnpublish()
+     * @uses SiteTreeExtension->onAfterUnpublish()
+     */
+    public function doUnpublish() {
+        if(!$this->ID) return false;
+        
+        $this->invokeWithExtensions('onBeforeUnpublish', $this);
+        
+        $origStage=Versioned::current_stage();
+        Versioned::reading_stage('Live');
+        
+        // This way our ID won't be unset
+        $clone = clone $this;
+        $clone->delete();
+        
+        Versioned::reading_stage($origStage);
+        
+        // If we're on the draft site, then we can update the status.
+        // Otherwise, these lines will resurrect an inappropriate record
+        if(DB::prepared_query("SELECT \"ID\" FROM \"".ClassInfo::baseDataClass($this->class)."\" WHERE \"ID\" = ?", array($this->ID))->value() && Versioned::current_stage() != 'Live') {
+            $this->write();
+        }
+        
+        $this->invokeWithExtensions('onAfterUnpublish', $this);
+        
+        return true;
+    }
 }
 
 class StagedManyManyTestSubObj extends DataObject implements TestOnly {

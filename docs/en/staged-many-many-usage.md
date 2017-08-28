@@ -17,11 +17,40 @@ class MyDataObject extends DataObject {
                                 );
 
     /**
-     * Removes all of the Images from the correct stage before deleting
+     * Unpublish this page - remove it from the live site
+     *
+     * @uses SiteTreeExtension->onBeforeUnpublish()
+     * @uses SiteTreeExtension->onAfterUnpublish()
      */
-    protected function onBeforeDelete() {
-        parent::onBeforeDelete();
+    public function doUnpublish() {
+        if(!$this->ID) return false;
 
-        $this->Images()->removeAll();
+        $this->invokeWithExtensions('onBeforeUnpublish', $this);
+
+        $origStage=Versioned::current_stage();
+        Versioned::reading_stage('Live');
+
+        // This way our ID won't be unset
+        $clone = clone $this;
+        $clone->delete();
+
+        Versioned::reading_stage($origStage);
+
+        // If we're on the draft site, then we can update the status.
+        // Otherwise, these lines will resurrect an inappropriate record
+        if(DB::prepared_query("SELECT \"ID\" FROM \"".ClassInfo::baseDataClass($this->class)."\" WHERE \"ID\" = ?", array($this->ID))->value() && Versioned::current_stage() != 'Live') {
+            $this->write();
+        }
+
+        $this->invokeWithExtensions('onAfterUnpublish', $this);
+
+        return true;
     }
+}
 ```
+
+
+## Non-SiteTree Version Objects
+Note that ``SiteTree`` defines ``doPublish``, ``doUnpublish``, ``doRevertToLive`` and ``doRollback`` methods these methods call corresponding "onAfter" extension points. If you have your own versioned ``DataObject`` descendent you must ensure that you have methods that call the following extension points for the appropriate actions. If you do not then the ``StagedManyManyRelationExtension`` will not work as expected since it is not called.
+
+* __onAfterUnpublish:__ This should be called after the object is unpublished.
