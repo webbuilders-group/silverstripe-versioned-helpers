@@ -189,21 +189,42 @@ class StagedManyManyRelationExtension extends DataExtension {
             }
             
             if($fromStage=='Stage' && $toStage=='Live') {
-                $this->owner->$relLiveName()->removeAll();
+                $list=$this->owner->$relLiveName();
+                
+                //Remove all from this relationship
+                $filter=$this->foreignIDFilter($list);
+                if(is_array($filter)) {
+                    //Delete regardless of whether the original objects exist or not
+                    $delete=new SQLDelete();
+                    $delete->setFrom('"'.$list->getJoinTable().'"');
+                    $delete->addWhere($filter);
+                    $delete->execute();
+                }
                 
                 $ids=$this->owner->$relName()->column('ID');
                 if(count($ids)>0) {
                     foreach($ids as $id) {
-                        $this->owner->$relLiveName()->add($id, $this->owner->$relName()->getExtraData($relName, $id));
+                        $list->add($id, $this->owner->$relName()->getExtraData($relName, $id));
                     }
                 }
             }else if($fromStage=='Live' && $toStage=='Stage') {
-                $this->owner->$relName()->removeAll();
+                $list=$this->owner->$relName();
+                
+                //Remove all from this relationship
+                $filter=$this->foreignIDFilter($list);
+                if(is_array($filter)) {
+                    //Delete regardless of whether the original objects exist or not
+                    $delete=new SQLDelete();
+                    $delete->setFrom('"'.$list->getJoinTable().'"');
+                    $delete->addWhere($filter);
+                    $delete->execute();
+                }
+                
                 
                 $ids=$this->owner->$relLiveName()->column('ID');
                 if(count($ids)>0) {
                     foreach($ids as $id) {
-                        $this->owner->$relName()->add($id, $this->owner->$relLiveName()->getExtraData($relName, $id));
+                        $list->add($id, $this->owner->$relLiveName()->getExtraData($relName, $id));
                     }
                 }
             }
@@ -227,7 +248,18 @@ class StagedManyManyRelationExtension extends DataExtension {
             }
             
             //Remove all from this relationship
-            $this->owner->$relLiveName()->removeAll();
+            $list=$this->owner->$relLiveName();
+            $filter=$this->foreignIDFilter($list);
+            if(!is_array($filter)) {
+                continue;
+            }
+            
+            
+            //Delete regardless of whether the original objects exist or not
+            $delete=new SQLDelete();
+            $delete->setFrom('"'.$list->getJoinTable().'"');
+            $delete->addWhere($filter);
+            $delete->execute();
         }
         
         self::$disabled=false;
@@ -256,6 +288,23 @@ class StagedManyManyRelationExtension extends DataExtension {
         }
         
         return $baseClass."_$stage";
+    }
+    
+    /**
+     * Return a filter expression for when getting the contents of the relationship for some foreign ID
+     * @param ManyManyList $list
+     * @return array
+     */
+    protected function foreignIDFilter(ManyManyList $list) {
+        $id=$list->getForeignID();
+        
+        // Apply relation filter
+        $key='"'.$list->getJoinTable().'"."'.$list->getForeignKey().'"';
+        if(is_array($id)) {
+            return array("$key IN (".DB::placeholders($id).")"=>$id);
+        }else if($id!==null){
+            return array($key=>$id);
+        }
     }
 }
 ?>
