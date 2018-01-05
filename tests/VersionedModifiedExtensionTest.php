@@ -164,6 +164,15 @@ class VersionedModifiedTestObj extends DataObject implements TestOnly {
         
         return $isModified;
     }
+    
+    /**
+     * Compare two stages to see if they're different. Only checks the version numbers, not the actual content.
+     * @param string $stage1 The first stage to check.
+     * @param string $stage2
+     */
+    public function stagesDiffer($stage1, $stage2) {
+        return max($this->extend('stagesDiffer', $stage1, $stage2));
+    }
 }
 
 class VersionedModifiedTestSubObj extends DataObject implements TestOnly {

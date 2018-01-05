@@ -124,79 +124,62 @@ class VersionedModifiedExtension extends DataExtension {
      * @param string $stage2
      */
     public function stagesDiffer($stage1, $stage2) {
-        $table1=$this->baseTable($stage1);
-        $table2=$this->baseTable($stage2);
-        
-        if(!is_numeric($this->owner->ID)) {
-            return true;
-        }
-        
-        // We test for equality - if one of the versions doesn't exist, this will be false.
-        
-        $stagesAreEqual=DB::prepared_query(
-                                            "SELECT CASE WHEN \"$table1\".\"Version\"=\"$table2\".\"Version\" THEN 1 ELSE 0 END
-                                             FROM \"$table1\" INNER JOIN \"$table2\" ON \"$table1\".\"ID\" = \"$table2\".\"ID\"
-                                             AND \"$table1\".\"ID\" = ?",
-                                            array($this->owner->ID)
-                                        )->value();
-        
+        $stagesAreEqual=true;
         
         //Check to see if the items differ
-        if($stagesAreEqual) {
-            foreach($this->_relations as $relation) {
-                $relClass=$this->owner->hasMany($relation);
-                if(!$relClass) {
-                    continue;
-                }
-                
-                $baseClass=ClassInfo::baseDataClass($relClass);
-                
-                $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
-                if(!$parentField) {
-                    continue;
-                }
-                
-                //Make sure the Items all exist on both stages
-                $stageItems=Versioned::get_by_stage($relClass, 'Stage')->filter($parentField, $this->owner->ID)->column('ID');
-                $liveItems=Versioned::get_by_stage($relClass, 'Live')->filter($parentField, $this->owner->ID)->column('ID');
-                
-                $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
-                if(count($diff)>0) {
-                    $stagesAreEqual=false;
-                }
-                
-                //Check each item to see if it is modified
-                if($stagesAreEqual) {
-                    $hasDifferMethod=singleton($relClass)->hasMethod('stagesDiffer');
-                        
-                    $table1=($stage1=='Stage' ? $relClass:$relClass.'_'.$stage1);
-                    $table2=($stage2=='Stage' ? $relClass:$relClass.'_'.$stage2);
-                    foreach($stageItems as $itemID) {
-                        if($hasDifferMethod) {
-                            $item=Versioned::get_one_by_stage($baseClass, 'Stage', '"ID"='.intval($itemID));
-                            if(!empty($item) && $item!==false && $item->exists()) {
-                                $stagesAreEqual=!$item->stagesDiffer($stage1, $stage2);
-                            }else {
-                                $stagesAreEqual=false;
-                            }
+        foreach($this->_relations as $relation) {
+            $relClass=$this->owner->hasMany($relation);
+            if(!$relClass) {
+                continue;
+            }
+            
+            $baseClass=ClassInfo::baseDataClass($relClass);
+            
+            $parentField=$this->owner->getRemoteJoinField($relation, 'has_many');
+            if(!$parentField) {
+                continue;
+            }
+            
+            //Make sure the Items all exist on both stages
+            $stageItems=Versioned::get_by_stage($relClass, 'Stage')->filter($parentField, $this->owner->ID)->column('ID');
+            $liveItems=Versioned::get_by_stage($relClass, 'Live')->filter($parentField, $this->owner->ID)->column('ID');
+            
+            $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
+            if(count($diff)>0) {
+                $stagesAreEqual=false;
+            }
+            
+            //Check each item to see if it is modified
+            if($stagesAreEqual) {
+                $hasDifferMethod=singleton($relClass)->hasMethod('stagesDiffer');
+                    
+                $table1=($stage1=='Stage' ? $relClass:$relClass.'_'.$stage1);
+                $table2=($stage2=='Stage' ? $relClass:$relClass.'_'.$stage2);
+                foreach($stageItems as $itemID) {
+                    if($hasDifferMethod) {
+                        $item=Versioned::get_one_by_stage($baseClass, 'Stage', '"ID"='.intval($itemID));
+                        if(!empty($item) && $item!==false && $item->exists()) {
+                            $stagesAreEqual=!$item->stagesDiffer($stage1, $stage2);
                         }else {
-                            $stagesAreEqual=DB::prepared_query(
-                                                            "SELECT CASE WHEN \"$table1\".\"Version\"=\"$table2\".\"Version\" THEN 1 ELSE 0 END
-                                                            FROM \"$table1\" INNER JOIN \"$table2\" ON \"$table1\".\"ID\" = \"$table2\".\"ID\"
-                                                            AND \"$table1\".\"ID\" = ?",
-                                                            array($itemID)
-                                                        )->value();
+                            $stagesAreEqual=false;
                         }
-                        
-                        if(!$stagesAreEqual) {
-                            break;
-                        }
+                    }else {
+                        $stagesAreEqual=DB::prepared_query(
+                                                        "SELECT CASE WHEN \"$table1\".\"Version\"=\"$table2\".\"Version\" THEN 1 ELSE 0 END
+                                                        FROM \"$table1\" INNER JOIN \"$table2\" ON \"$table1\".\"ID\" = \"$table2\".\"ID\"
+                                                        AND \"$table1\".\"ID\" = ?",
+                                                        array($itemID)
+                                                    )->value();
+                    }
+                    
+                    if(!$stagesAreEqual) {
+                        break;
                     }
                 }
-                
-                if(!$stagesAreEqual) {
-                    break;
-                }
+            }
+            
+            if(!$stagesAreEqual) {
+                break;
             }
         }
         
