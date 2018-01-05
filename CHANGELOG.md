@@ -1,8 +1,10 @@
-# Changelog
+# Change Log
 
-All notable changes to this project will be documented in this file.
+## [0.2.0](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/0.2.0) (2018-01-05)
+[Full Changelog](https://github.com/webbuilders-group/silverstripe-versioned-helpers/compare/0.1.0...0.2.0)
 
-This project adheres to [Semantic Versioning](http://semver.org/).
+## [0.1.0](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/0.1.0) (2017-08-28)
+**Implemented enhancements:**
 
-
-## [0.1.0]
+- VersionedChildrenExtension clean up on delete [\#2](https://github.com/webbuilders-group/silverstripe-versioned-helpers/issues/2)
+- Build out Unit Tests [\#1](https://github.com/webbuilders-group/silverstripe-versioned-helpers/issues/1)
