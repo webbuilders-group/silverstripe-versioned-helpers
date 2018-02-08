@@ -50,6 +50,27 @@ class VersionedSupportExtension extends DataExtension {
     }
     
     /**
+     * Check if this page has been published.
+     * @return bool True if this object has been published.
+     */
+    public function getIsPublished() {
+        if(!$this->owner->exists()) {
+            return false;
+        }
+        
+        return (Versioned::get_versionnumber_by_stage($this->owner->class, 'Live', $this->owner->ID)>0);
+    }
+    
+    /**
+     * Check if this page has been published.
+     * @return bool True if this object has been published.
+     * @see VersionedSupportExtension::getIsPublished()
+     */
+    public function IsPublished() {
+        return $this->getIsPublished();
+    }
+    
+    /**
      * Return true if this page exists on the live site
      */
     public function getExistsOnLive() {
