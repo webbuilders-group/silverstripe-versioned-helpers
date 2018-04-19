@@ -266,6 +266,20 @@ class StagedManyManyRelationExtension extends DataExtension {
     }
     
     /**
+     * Disables the Staged Many Many Relation Modifier
+     */
+    public static function disable() {
+        self::$disabled=true;
+    }
+    
+    /**
+     * Enables the Staged Many Many Relation Modifier
+     */
+    public static function enable() {
+        self::$disabled=false;
+    }
+    
+    /**
      * Concatenates on the class name of the owner
      * @param string $item Relationship name to add to
      * @return string
