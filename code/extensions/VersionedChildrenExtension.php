@@ -85,7 +85,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
      * Revert the draft changes: replace the draft content with the content on live
      */
     public function onAfterRevertToLive() {
-        $origMode=Versioned::get_reading_mode();
+        $origStage=Versioned::current_stage();
         
         //Switch to the live site
         Versioned::reading_stage('Live');
@@ -137,7 +137,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
         }
         
         //Restore Versioned
-        Versioned::reading_stage($origMode);
+        Versioned::reading_stage($origStage);
     }
     
     /**
@@ -148,7 +148,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
     public function onAfterRollback($version) {
         //Rollback the questions
         if($version=='Live') {
-            $origMode=Versioned::get_reading_mode();
+            $origStage=Versioned::current_stage();
             
             //Switch to the live site
             Versioned::reading_stage('Live');
@@ -196,7 +196,7 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
             }
             
             //Restore Versioned
-            Versioned::reading_stage($origMode);
+            Versioned::reading_stage($origStage);
         }else if(is_numeric($version)) {
             $origStage=Versioned::current_stage();
             
