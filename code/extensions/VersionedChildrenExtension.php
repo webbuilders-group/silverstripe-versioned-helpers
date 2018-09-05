@@ -49,6 +49,16 @@ class VersionedChildrenExtension extends VersionedModifiedExtension {
                     
                     Versioned::set_reading_mode($oldMode);
                 }
+            }else if(Versioned::get_by_stage($relClass, 'Live')->filter($parentField, $this->owner->ID)->count()>0) { //If we have live items and we didn't have draft items remove all live items
+                $liveItems=Versioned::get_by_stage($relClass, 'Live')->filter($parentField, $this->owner->ID);
+                $oldMode=Versioned::get_reading_mode();
+                Versioned::reading_stage('Stage');
+                
+                foreach($liveItems as $item) {
+                    $item->deleteFromStage('Live');
+                }
+                
+                Versioned::set_reading_mode($oldMode);
             }
         }
     }
