@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.1"
+        "silverstripe/framework": "~4.1",
+        "silverstripe/versioned": "~1.1"
     },
     "support": {
         "issues": "https://github.com/webbuilders-group/silverstripe-versioned-helpers/issues"
