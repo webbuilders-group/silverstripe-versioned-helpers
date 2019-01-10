@@ -1,7 +1,7 @@
 {
     "name": "webbuilders-group/silverstripe-versioned-helpers",
     "description": "Provides a number of helpful extensions for working with custom data objects that are versioned or working with versioned relationships of SiteTree decedents",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "keywords": ["silverstripe", "versioned"],
     "license": "BSD-3-Clause",
     "authors": [

@@ -1,10 +1,10 @@
 <?php
 namespace WebbuildersGroup\VersionedHelpers\Tests;
 
-use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj;
-use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestSubObj;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Versioned\Versioned;
+use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj;
+use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestSubObj;
 
 
 class VersionedModifiedExtensionTest extends SapphireTest {
