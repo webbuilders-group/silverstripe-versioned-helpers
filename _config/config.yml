@@ -5,4 +5,4 @@ After:
 ---
 #MyDataObject:
 #    extensions:
-#        - "VersionedSupportExtension"
+#        - 'WebbuildersGroup\VersionedHelpers\VersionedSupportExtension'
