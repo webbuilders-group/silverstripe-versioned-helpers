@@ -4,6 +4,7 @@ namespace WebbuildersGroup\VersionedHelpers\Extensions;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\RelationList;
 use SilverStripe\ORM\Queries\SQLDelete;
@@ -162,14 +163,17 @@ class StagedManyManyRelationExtension extends DataExtension {
     }
     
     /**
-     * @TODO
+     * Handles reverting the relationship to live
+     * @param string|int $version Version number of stage name
+     * @see StagedManyManyRelationExtension::onAfterRollbackRecursive()
      */
     public function onAfterRollback($version) {
         $this->onAfterRollbackRecursive($version);
     }
     
     /**
-     * @TODO
+     * Handles reverting the relationship to live
+     * @param string|int $version Version number of stage name
      */
     public function onAfterRollbackRecursive($version) {
         if($version==Versioned::LIVE) {
