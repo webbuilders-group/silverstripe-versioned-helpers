@@ -1,25 +1,30 @@
 <?php
+namespace WebbuildersGroup\VersionedHelpers\Extensions;
+
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\RelationList;
+use SilverStripe\ORM\Queries\SQLDelete;
+use SilverStripe\Versioned\Versioned;
+
+
 /**
- * Class StagedManyManyRelationExtension
+ * Class \WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyRelationExtension
  *
  */
 class StagedManyManyRelationExtension extends DataExtension {
-    protected $_relations=array();
-    protected $_joinTables=array();
-    
     private static $disabled=false;
     
-    private $_originalOwnerClass=false;
-    
+    protected $_joinTables=array();
     
     /**
      * Constructor
      * @param string $relationship ... Names of the many_many relationships to sync the version state (Overloaded)
      */
-    public function __construct($relationship) {
+    public function __construct() {
         parent::__construct();
-        
-        $this->_relations=func_get_args();
     }
     
     /**
@@ -31,71 +36,21 @@ class StagedManyManyRelationExtension extends DataExtension {
         parent::setOwner($owner, $ownerBaseClass);
         
         if($this->owner instanceof DataObject) {
-            $this->_joinTables=array_map(array($this, 'concatOwnerTable'), $this->_relations);
+            $ownerClass=$this->owner->ClassName;
+            $relations=$this->owner->config()->get('staged_many_many');
+            if(!is_array($relations) || count($relations)==0) {
+                return;
+            }
             
-            
-            //In dev mode do validation of the relations
-            if(Director::isDev() && $this->_originalOwnerClass===false) {
-                $this->_originalOwnerClass=$this->owner->ClassName;
-                
-                if($this->_originalOwnerClass!=$this->owner->ClassName) {
-                    return;
-                }
-                
-                foreach($this->_relations as $relation) {
-                    $relationLive=$relation.'_Live';
-            
-                    $relClass=$this->owner->manyMany($relation);
-                    if(!$relClass) {
-                        user_error('Could not find the many_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
-                    }
-            
-                    $relLiveClass=$this->owner->manyMany($relationLive);
-                    if(!$relLiveClass || $relClass[1]!=$relLiveClass[1]) {
-                        user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$this->owner->class.'" or the class does not match.', E_USER_ERROR);
-                    }
+            foreach($relations as $relation) {
+                $details=$this->owner->getSchema()->manyManyComponent($ownerClass, $relation);
+                if($details) {
+                    $this->_joinTables[]=$details['join'];
+                }else {
+                    user_error('Could not find the many_many relationship "'.$relation.'" on "'.$ownerClass.'"', E_USER_ERROR);
                 }
             }
         }
-    }
-    
-    /**
-     * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
-     * @param bool $modified Whether or not the parent is modified or not
-     */
-    public function getIsModifiedOnStage(&$modified=false) {
-        self::$disabled=true;
-        
-        if(!$modified) {
-            foreach($this->_relations as $relation) {
-                $relationLive=$relation.'_Live';
-                
-                $relClass=$this->owner->manyMany($relation);
-                if(!$relClass) {
-                    continue;
-                }
-                
-                $relLiveClass=$this->owner->manyMany($relationLive);
-                if(!$relLiveClass || $relClass[1]!=$relLiveClass[1]) {
-                    continue;
-                }
-                
-                //Make sure the Items all exist on both stages
-                $stageItems=$this->owner->$relation()->column('ID');
-                $liveItems=$this->owner->$relationLive()->column('ID');
-                
-                $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
-                if(count($diff)>0) {
-                    $modified=true;
-                    break;
-                }
-            }
-        }
-        
-        
-        self::$disabled=false;
-        
-        return $modified;
     }
     
     /**
@@ -103,11 +58,16 @@ class StagedManyManyRelationExtension extends DataExtension {
      * @param string $stage1 The first stage to check.
      * @param string $stage2
      */
-    public function stagesDiffer($stage1, $stage2) {
+    public function stagesDiffer() {
         self::$disabled=true;
         
-        $table1=$this->baseTable($stage1);
-        $table2=$this->baseTable($stage2);
+        $stagesAreEqual=true;
+        
+        $ownerClass=$this->owner->ClassName;
+        $relations=$this->owner->config()->get('staged_many_many');
+        if(!is_array($relations) || count($relations)==0) {
+            return;
+        }
         
         if(!is_numeric($this->owner->ID)) {
             self::$disabled=false;
@@ -115,44 +75,31 @@ class StagedManyManyRelationExtension extends DataExtension {
             return true;
         }
         
-        // We test for equality - if one of the versions doesn't exist, this will be false.
-        
-        $stagesAreEqual=DB::prepared_query(
-                                            "SELECT CASE WHEN \"$table1\".\"Version\"=\"$table2\".\"Version\" THEN 1 ELSE 0 END
-                                             FROM \"$table1\" INNER JOIN \"$table2\" ON \"$table1\".\"ID\" = \"$table2\".\"ID\"
-                                             AND \"$table1\".\"ID\" = ?",
-                                            array($this->owner->ID)
-                                        )->value();
-        
-        
-        //Check to see if the items differ
-        if($stagesAreEqual) {
-            foreach($this->_relations as $relation) {
-                $relationLive=$relation.'_Live';
-                
-                $relClass=$this->owner->manyMany($relation);
-                if(!$relClass) {
-                    user_error('Could not find the many_many relationship "'.$relation.'" on "'.$this->owner->class.'"', E_USER_ERROR);
-                }
-                
-                $relLiveClass=$this->owner->manyMany($relationLive);
-                if(!$relLiveClass || $relClass[1]!=$relLiveClass[1]) {
-                    user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$this->owner->class.'" or the class does not match.', E_USER_ERROR);
-                }
-                
-                
-                //Make sure the Items all exist on both stages
-                $stageItems=$this->owner->$relation()->column('ID');
-                $liveItems=$this->owner->$relationLive()->column('ID');
-                
-                $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
-                if(count($diff)>0) {
-                    $stagesAreEqual=false;
-                }
-                
-                if(!$stagesAreEqual) {
-                    break;
-                }
+        foreach($relations as $relation) {
+            $relationLive=$relation.'_Live';
+            
+            $relClass=$this->owner->getSchema()->manyManyComponent($ownerClass, $relation);
+            if(!$relClass) {
+                user_error('Could not find the many_many relationship "'.$relation.'" on "'.$ownerClass.'"', E_USER_ERROR);
+            }
+            
+            $relLiveClass=$this->owner->getSchema()->manyManyComponent($ownerClass, $relationLive);
+            if(!$relLiveClass || $relClass['childClass']!=$relLiveClass['childClass']) {
+                user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$ownerClass.'" or the class does not match.', E_USER_ERROR);
+            }
+            
+            
+            //Make sure the Items all exist on both stages
+            $stageItems=$this->owner->$relation()->column('ID');
+            $liveItems=$this->owner->$relationLive()->column('ID');
+            
+            $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
+            if(count($diff)>0) {
+                $stagesAreEqual=false;
+            }
+            
+            if(!$stagesAreEqual) {
+                break;
             }
         }
         
@@ -163,51 +110,84 @@ class StagedManyManyRelationExtension extends DataExtension {
     
     /**
      * Handles versioning of the many_many relations
-     * @param ManyManyList $list Many Many List to replace
+     * @param RelationList $list Many Many List to replace
      */
-    public function updateManyManyComponents(ManyManyList &$list) {
-        if(self::$disabled==false && Versioned::current_stage()=='Live' && in_array($list->getJoinTable(), $this->_joinTables)) {
+    public function updateManyManyComponents(RelationList &$list) {
+        if(self::$disabled==false && $list instanceof ManyManyList && Versioned::get_stage()==Versioned::LIVE && in_array($list->getJoinTable(), $this->_joinTables)) {
             $list=ManyManyList::create($list->dataClass(), $list->getJoinTable().'_Live', $list->getLocalKey(), $list->getForeignKey(), $list->getExtraFields());
         }
     }
     
     /**
      * Handles publishing the versioned many_many relationships
-     * @param string $fromStage Stage to publish from
-     * @param string $toStage Stage to publish to
-     * @param bool $createNewVersion Whether to create a new version or not
+     * @param DataObjectInterface $original Original object being published
      */
-    public function onBeforeVersionedPublish($fromStage, $toStage, $createNewVersion) {
+    public function onAfterPublish(DataObjectInterface $original=null) {
         self::$disabled=true;
         
-        foreach($this->_relations as $relName) {
+        $relations=$this->owner->config()->get('staged_many_many');
+        if(!is_array($relations) || count($relations)==0) {
+            return;
+        }
+        
+        foreach($relations as $relName) {
             $relLiveName=$relName.'_Live';
             
-            $relClass=$this->owner->manyMany($relLiveName);
+            $relClass=$this->owner->getSchema()->manyManyComponent($this->owner->ClassName, $relLiveName);
             if(!$relClass) {
                 continue;
             }
             
-            if($fromStage=='Stage' && $toStage=='Live') {
-                $list=$this->owner->$relLiveName();
+            $list=$this->owner->$relLiveName();
+            
+            //Remove all from this relationship
+            $filter=$this->foreignIDFilter($list);
+            if(is_array($filter)) {
+                //Delete regardless of whether the original objects exist or not
+                $delete=new SQLDelete();
+                $delete->setFrom('"'.$list->getJoinTable().'"');
+                $delete->addWhere($filter);
+                $delete->execute();
+            }
+            
+            $ids=$this->owner->$relName()->column('ID');
+            if(count($ids)>0) {
+                foreach($ids as $id) {
+                    $list->add($id, $this->owner->$relName()->getExtraData($relName, $id));
+                }
+            }
+        }
+        
+        self::$disabled=false;
+    }
+    
+    /**
+     * @TODO
+     */
+    public function onAfterRollback($version) {
+        $this->onAfterRollbackRecursive($version);
+    }
+    
+    /**
+     * @TODO
+     */
+    public function onAfterRollbackRecursive($version) {
+        if($version==Versioned::LIVE) {
+            self::$disabled=true;
+            
+            $relations=$this->owner->config()->get('staged_many_many');
+            if(!is_array($relations) || count($relations)==0) {
+                return;
+            }
+            
+            foreach($relations as $relName) {
+                $relLiveName=$relName.'_Live';
                 
-                //Remove all from this relationship
-                $filter=$this->foreignIDFilter($list);
-                if(is_array($filter)) {
-                    //Delete regardless of whether the original objects exist or not
-                    $delete=new SQLDelete();
-                    $delete->setFrom('"'.$list->getJoinTable().'"');
-                    $delete->addWhere($filter);
-                    $delete->execute();
+                $relClass=$this->owner->getSchema()->manyManyComponent($this->owner->ClassName, $relLiveName);
+                if(!$relClass) {
+                    continue;
                 }
                 
-                $ids=$this->owner->$relName()->column('ID');
-                if(count($ids)>0) {
-                    foreach($ids as $id) {
-                        $list->add($id, $this->owner->$relName()->getExtraData($relName, $id));
-                    }
-                }
-            }else if($fromStage=='Live' && $toStage=='Stage') {
                 $list=$this->owner->$relName();
                 
                 //Remove all from this relationship
@@ -228,9 +208,9 @@ class StagedManyManyRelationExtension extends DataExtension {
                     }
                 }
             }
+            
+            self::$disabled=false;
         }
-        
-        self::$disabled=false;
     }
     
     /**
@@ -239,10 +219,15 @@ class StagedManyManyRelationExtension extends DataExtension {
     public function onAfterUnpublish() {
         self::$disabled=true;
         
-        foreach($this->_relations as $relation) {
+        $relations=$this->owner->config()->get('staged_many_many');
+        if(!is_array($relations) || count($relations)==0) {
+            return;
+        }
+        
+        foreach($relations as $relation) {
             $relLiveName=$relation.'_Live';
             
-            $relClass=$this->owner->manyMany($relLiveName);
+            $relClass=$this->owner->getSchema()->manyManyComponent($this->owner->ClassName, $relLiveName);
             if(!$relClass) {
                 continue;
             }
@@ -277,31 +262,6 @@ class StagedManyManyRelationExtension extends DataExtension {
      */
     public static function enable() {
         self::$disabled=false;
-    }
-    
-    /**
-     * Concatenates on the class name of the owner
-     * @param string $item Relationship name to add to
-     * @return string
-     */
-    protected function concatOwnerTable($item) {
-        return $this->owner->class.'_'.$item;
-    }
-    
-    /**
-     * Return the base table - the class that directly extends DataObject.
-     * @param string $stage Override the stage used
-     * @return string
-     */
-    protected function baseTable($stage=null) {
-        $tableClasses=ClassInfo::dataClassesFor($this->owner->class);
-        $baseClass=array_shift($tableClasses);
-        
-        if(!$stage || $stage==$this->owner->getDefaultStage()) {
-            return $baseClass;
-        }
-        
-        return $baseClass."_$stage";
     }
     
     /**

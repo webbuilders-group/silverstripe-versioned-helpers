@@ -1,4 +1,4 @@
-StagedManyManyTestSubObj:
+WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj:
     sub1:
         Title: "Sub Object 1"
     sub2:
@@ -9,16 +9,16 @@ StagedManyManyTestSubObj:
         Title: "Sub Object 4"
 
 
-StagedManyManyTestObj:
+WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestObj:
     item1:
         Title: "Test Object 1"
-        SubObjs: =>StagedManyManyTestSubObj.sub1
+        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub1
     item2:
         Title: "Test Object 2"
-        SubObjs: =>StagedManyManyTestSubObj.sub2
+        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub2
     item3:
         Title: "Test Object 3"
-        SubObjs: =>StagedManyManyTestSubObj.sub3
+        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub3
     item4:
         Title: "Test Object 4"
-        SubObjs: =>StagedManyManyTestSubObj.sub4
+        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub4

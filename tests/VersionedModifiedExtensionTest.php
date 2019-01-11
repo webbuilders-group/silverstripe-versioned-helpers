@@ -10,9 +10,9 @@ use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestSub
 class VersionedModifiedExtensionTest extends SapphireTest {
     protected static $fixture_file='VersionedModifiedExtensionTest.yml';
     protected static $extra_dataobjects=array(
-                                    VersionedModifiedTestObj::class,
-                                    VersionedModifiedTestSubObj::class
-                                );
+                                            VersionedModifiedTestObj::class,
+                                            VersionedModifiedTestSubObj::class
+                                        );
     
     /**
      * Test stagesDiffer between Stage and Live just after publishing when it should not be modified on stage then
