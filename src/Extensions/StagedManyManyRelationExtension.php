@@ -56,8 +56,7 @@ class StagedManyManyRelationExtension extends DataExtension {
     
     /**
      * Compare two stages to see if they're different. Only checks the ID's match, not the actual content.
-     * @param string $stage1 The first stage to check.
-     * @param string $stage2
+     * @return bool
      */
     public function stagesDiffer() {
         self::$disabled=true;
@@ -266,6 +265,14 @@ class StagedManyManyRelationExtension extends DataExtension {
      */
     public static function enable() {
         self::$disabled=false;
+    }
+    
+    /**
+     * Gets whether the Staged Many Many Relation Modifier is enabled or not
+     * @return bool
+     */
+    public static function get_enabled() {
+        return !self::$disabled;
     }
     
     /**

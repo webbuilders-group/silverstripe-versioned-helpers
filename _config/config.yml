@@ -3,6 +3,6 @@ Name: versioned_helpers
 After:
     - "framework/*"
 ---
-#MyDataObject:
-#    extensions:
-#        - 'WebbuildersGroup\VersionedHelpers\VersionedSupportExtension'
+SilverStripe\Versioned\ChangeSetItem:
+    extensions:
+        - 'WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyChangeSetItem'
