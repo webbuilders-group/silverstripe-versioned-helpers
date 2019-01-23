@@ -1,6 +1,7 @@
 <?php
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
+use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
@@ -75,37 +76,74 @@ class StagedManyManyRelationExtension extends DataExtension {
             return true;
         }
         
+        
+        $schema=$this->owner->getSchema();
         foreach($relations as $relation) {
             $relationLive=$relation.'_Live';
             
-            $relClass=$this->owner->getSchema()->manyManyComponent($ownerClass, $relation);
+            $relClass=$schema->manyManyComponent($ownerClass, $relation);
             if(!$relClass) {
                 user_error('Could not find the many_many relationship "'.$relation.'" on "'.$ownerClass.'"', E_USER_ERROR);
             }
             
-            $relLiveClass=$this->owner->getSchema()->manyManyComponent($ownerClass, $relationLive);
+            $relLiveClass=$schema->manyManyComponent($ownerClass, $relationLive);
             if(!$relLiveClass || $relClass['childClass']!=$relLiveClass['childClass']) {
                 user_error('Could not find the many_many relationship "'.$relationLive.'" on "'.$ownerClass.'" or the class does not match.', E_USER_ERROR);
             }
             
             
             //Make sure the Items all exist on both stages
-            $stageItems=$this->owner->$relation()->column('ID');
-            $liveItems=$this->owner->$relationLive()->column('ID');
+            $stageItems=iterator_to_array(DB::prepared_query('SELECT * FROM "'.Convert::raw2sql($relClass['join']).'" WHERE "'.Convert::raw2sql($relClass['parentField']).'"= ?', array($this->owner->ID)));
+            $liveItems=iterator_to_array(DB::prepared_query('SELECT * FROM "'.Convert::raw2sql($relLiveClass['join']).'" WHERE "'.Convert::raw2sql($relLiveClass['parentField']).'"= ?', array($this->owner->ID)));
+            $stageValues=array_column($stageItems, $relClass['childField']);
+            $liveValues=array_column($liveItems, $relLiveClass['childField']);
             
-            $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
+            $diff=array_merge(array_diff($stageValues, $liveValues), array_diff($liveValues, $stageValues));
             if(count($diff)>0) {
                 $stagesAreEqual=false;
             }
+            
+            
+            //Differ the extra fields if there are any
+            if($stagesAreEqual) {
+                $stageExtra=$schema->manyManyExtraFieldsForComponent($ownerClass, $relation);
+                $liveExtra=$schema->manyManyExtraFieldsForComponent($ownerClass, $relationLive);
+                
+                if(!empty($stageExtra) && !empty($liveExtra) && count(array_merge(array_diff_key($stageExtra, $liveExtra), array_diff_key($liveExtra, $stageExtra)))==0) {
+                    foreach($stageExtra as $extraField=>$fieldType) {
+                        $stageValues=array_column($stageItems, $extraField, $relClass['childField']);
+                        $liveValues=array_column($liveItems, $extraField, $relLiveClass['childField']);
+                        
+                        $diff=array_merge(array_diff_assoc($stageValues, $liveValues), array_diff_assoc($liveValues, $stageValues));
+                        if(count($diff)>0) {
+                            $stagesAreEqual=false;
+                        }
+                        
+                        if(!$stagesAreEqual) {
+                            break;
+                        }
+                    }
+                }
+            }
+            
             
             if(!$stagesAreEqual) {
                 break;
             }
         }
         
+        
         self::$disabled=false;
         
         return !$stagesAreEqual;
+    }
+    
+    /**
+     * Wrapper for StagedManyManyRelationExtension::stagesDiffer()
+     * @return bool
+     */
+    public function isModifiedOnDraft() {
+        return $this->stagesDiffer();
     }
     
     /**

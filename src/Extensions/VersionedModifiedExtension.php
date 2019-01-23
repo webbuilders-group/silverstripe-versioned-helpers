@@ -86,5 +86,13 @@ class VersionedModifiedExtension extends DataExtension {
         
         return !$stagesAreEqual;
     }
+    
+    /**
+     * Wrapper for VersionedModifiedExtension::stagesDiffer()
+     * @return bool
+     */
+    public function isModifiedOnDraft() {
+        return $this->stagesDiffer();
+    }
 }
 ?>
