@@ -76,7 +76,7 @@ class StagedManyManyChangeSetItem extends DataExtension {
             $stageItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relClass['join']).'".* '.
                                                             'FROM "'.Convert::raw2sql($relClass['join']).'" '.
                                                             'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relClass['parentField']).'"= ?', array($this->owner->ID)));
+                                                            'WHERE "'.Convert::raw2sql($relClass['parentField']).'"= ?', array($object->ID)));
             
             //If Versioned is present change the child table to _Live
             if($relClass['childClass']::has_extension(Versioned::class)) {
@@ -86,7 +86,7 @@ class StagedManyManyChangeSetItem extends DataExtension {
             $liveItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relLiveClass['join']).'".* '.
                                                             'FROM "'.Convert::raw2sql($relLiveClass['join']).'" '.
                                                             'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relLiveClass['parentField']).'"= ?', array($this->owner->ID)));
+                                                            'WHERE "'.Convert::raw2sql($relLiveClass['parentField']).'"= ?', array($object->ID)));
             
             $stageValues=array_column($stageItems, $relClass['childField']);
             $liveValues=array_column($liveItems, $relLiveClass['childField']);
