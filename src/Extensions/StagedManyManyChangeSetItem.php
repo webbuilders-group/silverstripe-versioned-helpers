@@ -2,10 +2,11 @@
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\Versioned\ChangeSetItem;
+use SilverStripe\Versioned\Versioned;
 
 
 /**
@@ -73,20 +74,28 @@ class StagedManyManyChangeSetItem extends DataExtension {
             
             //Make sure the Items all exist on both stages
             $childTable=$schema->tableName($relClass['childClass']);
-            $stageItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relClass['join']).'".* '.
-                                                            'FROM "'.Convert::raw2sql($relClass['join']).'" '.
-                                                            'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relClass['parentField']).'"= ?', array($object->ID)));
+            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', $relClass['join'])
+                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')
+                                ->addWhere(array('"'.Convert::raw2sql($relClass['parentField']).'"= ?'=>$object->ID));
+            
+            $queryStage=Versioned::DRAFT;
+            $this->owner->invokeWithExtensions('updateStagedManyManyDiffQuery', $query, $object, $relation, $relationLive, $queryStage);
+            
+            $stageItems=iterator_to_array($query->execute());
             
             //If Versioned is present change the child table to _Live
             if($relClass['childClass']::has_extension(Versioned::class)) {
                 $childTable.='_Live';
             }
             
-            $liveItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relLiveClass['join']).'".* '.
-                                                            'FROM "'.Convert::raw2sql($relLiveClass['join']).'" '.
-                                                            'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relLiveClass['parentField']).'"= ?', array($object->ID)));
+            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', $relLiveClass['join'])
+                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'"')
+                                ->addWhere(array('"'.Convert::raw2sql($relLiveClass['parentField']).'"= ?'=>$object->ID));
+            
+            $queryStage=Versioned::LIVE;
+            $this->owner->invokeWithExtensions('updateStagedManyManyDiffQuery', $query, $object, $relation, $relationLive, $queryStage);
+            
+            $liveItems=iterator_to_array($query->execute());
             
             $stageValues=array_column($stageItems, $relClass['childField']);
             $liveValues=array_column($liveItems, $relLiveClass['childField']);

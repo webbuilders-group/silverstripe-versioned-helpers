@@ -9,6 +9,7 @@ use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\RelationList;
 use SilverStripe\ORM\Queries\SQLDelete;
+use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\Versioned\Versioned;
 
 
@@ -20,6 +21,12 @@ class StagedManyManyRelationExtension extends DataExtension {
     private static $disabled=false;
     
     protected $_joinTables=array();
+    
+    const QUERY_CLEANUP_ROLLBACK='QUERY_TYPE_CLEANUP_TASK_ROLLBACK';
+    const QUERY_CLEANUP_UNPUBLISH='QUERY_TYPE_CLEANUP_UNPUBLISH';
+    const QUERY_CLEANUP_PUBLISH='QUERY_TYPE_CLEANUP_PUBLISH';
+    const QUERY_DIFFER_DATA_FETCH='QUERY_TYPE_DIFFER_DATA_FETCH';
+    
     
     /**
      * Constructor
@@ -94,20 +101,31 @@ class StagedManyManyRelationExtension extends DataExtension {
             
             //Make sure the Items all exist on both stages
             $childTable=$schema->tableName($relClass['childClass']);
-            $stageItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relClass['join']).'".* '.
-                                                            'FROM "'.Convert::raw2sql($relClass['join']).'" '.
-                                                            'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relClass['parentField']).'"= ?', array($this->owner->ID)));
+            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', $relClass['join'])
+                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')
+                                ->addWhere(array('"'.Convert::raw2sql($relClass['parentField']).'"= ?'=>$this->owner->ID));
+            
+            $queryType=self::QUERY_DIFFER_DATA_FETCH;
+            $queryStage=Versioned::DRAFT;
+            $this->owner->invokeWithExtensions('updateStagedManyManyQuery', $query, $relation, $relationLive, $queryType, $queryStage);
+            
+            $stageItems=iterator_to_array($query->execute());
             
             //If Versioned is present change the child table to _Live
             if($relClass['childClass']::has_extension(Versioned::class)) {
                 $childTable.='_Live';
             }
             
-            $liveItems=iterator_to_array(DB::prepared_query('SELECT "'.Convert::raw2sql($relLiveClass['join']).'".* '.
-                                                            'FROM "'.Convert::raw2sql($relLiveClass['join']).'" '.
-                                                            'INNER JOIN "'.Convert::raw2sql($childTable).'" ON "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'" '.
-                                                            'WHERE "'.Convert::raw2sql($relLiveClass['parentField']).'"= ?', array($this->owner->ID)));
+            $childTable=$schema->tableName($relLiveClass['childClass']);
+            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', $relLiveClass['join'])
+                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'"')
+                                ->addWhere(array('"'.Convert::raw2sql($relLiveClass['parentField']).'"= ?'=>$this->owner->ID));
+            
+            $queryType=self::QUERY_DIFFER_DATA_FETCH;
+            $queryStage=Versioned::LIVE;
+            $this->owner->invokeWithExtensions('updateStagedManyManyQuery', $query, $relation, $relationLive, $queryType, $queryStage);
+            
+            $liveItems=iterator_to_array($query->execute());
             
             $stageValues=array_column($stageItems, $relClass['childField']);
             $liveValues=array_column($liveItems, $relLiveClass['childField']);
@@ -199,6 +217,11 @@ class StagedManyManyRelationExtension extends DataExtension {
                 $delete=new SQLDelete();
                 $delete->setFrom('"'.$list->getJoinTable().'"');
                 $delete->addWhere($filter);
+                
+                $queryType=self::QUERY_CLEANUP_PUBLISH;
+                $queryStage=Versioned::LIVE;
+                $this->owner->invokeWithExtensions('updateStagedManyManyQuery', $delete, $relName, $relLiveName, $queryType, $queryStage);
+                
                 $delete->execute();
             }
             
@@ -252,6 +275,11 @@ class StagedManyManyRelationExtension extends DataExtension {
                     $delete=new SQLDelete();
                     $delete->setFrom('"'.$list->getJoinTable().'"');
                     $delete->addWhere($filter);
+                    
+                    $queryType=self::QUERY_CLEANUP_ROLLBACK;
+                    $queryStage=Versioned::DRAFT;
+                    $this->owner->invokeWithExtensions('updateStagedManyManyQuery', $delete, $relName, $relLiveName, $queryType, $queryStage);
+                    
                     $delete->execute();
                 }
                 
@@ -299,6 +327,11 @@ class StagedManyManyRelationExtension extends DataExtension {
             $delete=new SQLDelete();
             $delete->setFrom('"'.$list->getJoinTable().'"');
             $delete->addWhere($filter);
+            
+            $queryType=self::QUERY_CLEANUP_UNPUBLISH;
+            $queryStage=Versioned::LIVE;
+            $this->owner->invokeWithExtensions('updateStagedManyManyQuery', $delete, $relation, $relLiveName, $queryType, $queryStage);
+            
             $delete->execute();
         }
         
