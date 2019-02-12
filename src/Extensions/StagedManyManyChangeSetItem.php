@@ -81,7 +81,7 @@ class StagedManyManyChangeSetItem extends DataExtension {
             //Make sure the Items all exist on both stages
             $childTable=$schema->tableName($relClass['childClass']);
             $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', '"'.$relClass['join'].'"')
-                                ->addInnerJoin($childTable, '"'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')'"'
+                                ->addInnerJoin($childTable, '"'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')
                                 ->addWhere(array('"'.Convert::raw2sql($relClass['parentField']).'"= ?'=>$object->ID));
             
             $queryStage=Versioned::DRAFT;
