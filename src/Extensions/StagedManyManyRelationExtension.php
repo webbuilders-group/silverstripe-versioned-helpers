@@ -101,7 +101,7 @@ class StagedManyManyRelationExtension extends DataExtension {
             
             //Make sure the Items all exist on both stages
             $childTable=$schema->tableName($relClass['childClass']);
-            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', $relClass['join'])
+            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', '"'.$relClass['join'].'"')
                                 ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')
                                 ->addWhere(array('"'.Convert::raw2sql($relClass['parentField']).'"= ?'=>$this->owner->ID));
             
@@ -117,7 +117,7 @@ class StagedManyManyRelationExtension extends DataExtension {
             }
             
             $childTable=$schema->tableName($relLiveClass['childClass']);
-            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', $relLiveClass['join'])
+            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', '"'.$relLiveClass['join'].'"')
                                 ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'"')
                                 ->addWhere(array('"'.Convert::raw2sql($relLiveClass['parentField']).'"= ?'=>$this->owner->ID));
             
@@ -214,8 +214,7 @@ class StagedManyManyRelationExtension extends DataExtension {
             $filter=$this->foreignIDFilter($list);
             if(is_array($filter)) {
                 //Delete regardless of whether the original objects exist or not
-                $delete=new SQLDelete();
-                $delete->setFrom('"'.$list->getJoinTable().'"');
+                $delete=SQLDelete::create('"'.$list->getJoinTable().'"');
                 $delete->addWhere($filter);
                 
                 $queryType=self::QUERY_CLEANUP_PUBLISH;
@@ -272,8 +271,7 @@ class StagedManyManyRelationExtension extends DataExtension {
                 $filter=$this->foreignIDFilter($list);
                 if(is_array($filter)) {
                     //Delete regardless of whether the original objects exist or not
-                    $delete=new SQLDelete();
-                    $delete->setFrom('"'.$list->getJoinTable().'"');
+                    $delete=SQLDelete::create('"'.$list->getJoinTable().'"');
                     $delete->addWhere($filter);
                     
                     $queryType=self::QUERY_CLEANUP_ROLLBACK;
@@ -324,8 +322,7 @@ class StagedManyManyRelationExtension extends DataExtension {
             
             
             //Delete regardless of whether the original objects exist or not
-            $delete=new SQLDelete();
-            $delete->setFrom('"'.$list->getJoinTable().'"');
+            $delete=SQLDelete::create('"'.$list->getJoinTable().'"');
             $delete->addWhere($filter);
             
             $queryType=self::QUERY_CLEANUP_UNPUBLISH;

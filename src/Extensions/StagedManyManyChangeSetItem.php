@@ -80,8 +80,8 @@ class StagedManyManyChangeSetItem extends DataExtension {
             
             //Make sure the Items all exist on both stages
             $childTable=$schema->tableName($relClass['childClass']);
-            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', $relClass['join'])
-                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')
+            $query=SQLSelect::create('"'.Convert::raw2sql($relClass['join']).'".*', '"'.$relClass['join'].'"')
+                                ->addInnerJoin($childTable, '"'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relClass['join']).'"."'.Convert::raw2sql($relClass['childField']).'"')'"'
                                 ->addWhere(array('"'.Convert::raw2sql($relClass['parentField']).'"= ?'=>$object->ID));
             
             $queryStage=Versioned::DRAFT;
@@ -94,8 +94,8 @@ class StagedManyManyChangeSetItem extends DataExtension {
                 $childTable.='_Live';
             }
             
-            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', $relLiveClass['join'])
-                                ->addInnerJoin($childTable, ' "'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'"')
+            $query=SQLSelect::create('"'.Convert::raw2sql($relLiveClass['join']).'".*', '"'.$relLiveClass['join'].'"')
+                                ->addInnerJoin($childTable, '"'.Convert::raw2sql($childTable).'"."ID"="'.Convert::raw2sql($relLiveClass['join']).'"."'.Convert::raw2sql($relLiveClass['childField']).'"')
                                 ->addWhere(array('"'.Convert::raw2sql($relLiveClass['parentField']).'"= ?'=>$object->ID));
             
             $queryStage=Versioned::LIVE;
