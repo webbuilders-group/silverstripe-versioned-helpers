@@ -14,6 +14,12 @@ use SilverStripe\Versioned\Versioned;
  *
  */
 class StagedManyManyChangeSetItem extends DataExtension {
+    /**
+     * Updates the change type if the staged_many_many relationships differ
+     * @param string $type Type of the change
+     * @param int $draftVersion Version of the draft record
+     * @param int $liveVersion Version of the live record
+     */
     public function updateChangeType(&$type, $draftVersion, $liveVersion) {
         //Make sure we have a change type of none if not do nothing
         if($type!=ChangeSetItem::CHANGE_NONE) {
