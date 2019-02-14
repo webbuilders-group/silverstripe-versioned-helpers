@@ -58,7 +58,7 @@ class VersionedModifiedExtension extends DataExtension {
                 $table2=DataObject::getSchema()->tableName($relClass).'_'.Versioned::LIVE;
                 foreach($stageItems as $itemID) {
                     if($hasDifferMethod) {
-                        $item=Versioned::get_one_by_stage($baseClass, Versioned::DRAFT, '"ID"='.intval($itemID));
+                        $item=Versioned::get_one_by_stage($baseClass, Versioned::DRAFT, '"'.$table1.'"."ID"='.intval($itemID));
                         if(!empty($item) && $item!==false && $item->exists()) {
                             $stagesAreEqual=!$item->stagesDiffer();
                         }else {
