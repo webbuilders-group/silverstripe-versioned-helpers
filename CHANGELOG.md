@@ -1,7 +1,10 @@
 # Change Log
 
-## [2.0.3](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/2.0.2) (2019-02-12)
-[Full Changelog](https://github.com/webbuilders-group/silverstripe-versioned-helpers/compare/2.0.1...2.0.3)
+## [2.0.4](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/2.0.4) (2019-02-14)
+[Full Changelog](https://github.com/webbuilders-group/silverstripe-versioned-helpers/compare/2.0.3...2.0.4)
+
+## [2.0.3](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/2.0.3) (2019-02-12)
+[Full Changelog](https://github.com/webbuilders-group/silverstripe-versioned-helpers/compare/2.0.2...2.0.3)
 
 ## [2.0.2](https://github.com/webbuilders-group/silverstripe-versioned-helpers/tree/2.0.2) (2019-02-07)
 [Full Changelog](https://github.com/webbuilders-group/silverstripe-versioned-helpers/compare/2.0.1...2.0.2)
