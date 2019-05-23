@@ -36,14 +36,29 @@ class VersionedModifiedExtension extends DataExtension {
             
             $baseClass=DataObject::getSchema()->baseDataClass($relClass);
             
-            $parentField=$this->owner->getSchema()->getRemoteJoinField($ownerClass, $relation, 'has_many');
+            $isPolymorphic=false;
+            $parentField=$this->owner->getSchema()->getRemoteJoinField($ownerClass, $relation, 'has_many', $isPolymorphic);
             if(!$parentField) {
                 continue;
             }
             
+            
+            //For Polymorphic Parent relationships we need to amend the query a bit more
+            if($isPolymorphic) {
+                $filters=[
+                            $parentField.'ID'=>$this->owner->ID,
+                            $parentField.'Class'=>$ownerClass,
+                        ];
+            } else {
+                $filters=[
+                            $parentField=>$this->owner->ID,
+                        ];
+            }
+            
+            
             //Make sure the Items all exist on both stages
-            $stageItems=Versioned::get_by_stage($relClass, Versioned::DRAFT)->filter($parentField, $this->owner->ID)->column('ID');
-            $liveItems=Versioned::get_by_stage($relClass, Versioned::LIVE)->filter($parentField, $this->owner->ID)->column('ID');
+            $stageItems=Versioned::get_by_stage($relClass, Versioned::DRAFT)->filter($filters)->column('ID');
+            $liveItems=Versioned::get_by_stage($relClass, Versioned::LIVE)->filter($filters)->column('ID');
             
             $diff=array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
             if(count($diff)>0) {
