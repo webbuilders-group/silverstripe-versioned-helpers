@@ -6,20 +6,21 @@ use SilverStripe\Versioned\Versioned;
 use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj;
 use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestSubObj;
 
-
-class VersionedModifiedExtensionTest extends SapphireTest {
-    protected static $fixture_file='VersionedModifiedExtensionTest.yml';
-    protected static $extra_dataobjects=array(
-                                            VersionedModifiedTestObj::class,
-                                            VersionedModifiedTestSubObj::class
-                                        );
+class VersionedModifiedExtensionTest extends SapphireTest
+{
+    protected static $fixture_file = 'VersionedModifiedExtensionTest.yml';
+    protected static $extra_dataobjects = [
+        VersionedModifiedTestObj::class,
+        VersionedModifiedTestSubObj::class,
+    ];
     
     /**
      * Test stagesDiffer between Stage and Live just after publishing when it should not be modified on stage then
      * after changing the staged version without publishing making sure children count
      */
-    public function testStagesDiffer() {
-        $obj=$this->objFromFixture(VersionedModifiedTestObj::class, 'item2');
+    public function testStagesDiffer()
+    {
+        $obj = $this->objFromFixture(VersionedModifiedTestObj::class, 'item2');
         
         
         //Make sure stagesDiffer(Versioned::DRAFT, Versioned::LIVE) returns true when not published
@@ -39,7 +40,7 @@ class VersionedModifiedExtensionTest extends SapphireTest {
         
         
         //Change the draft
-        $obj->Title=$obj->Title.' (changed)';
+        $obj->Title = $obj->Title . ' (changed)';
         $obj->write();
         
         
@@ -49,7 +50,7 @@ class VersionedModifiedExtensionTest extends SapphireTest {
         
         //Publish the object and it's children
         $obj->publishRecursive();
-        foreach($obj->SubObjs() as $subObj) {
+        foreach ($obj->SubObjs() as $subObj) {
             $subObj->publish(Versioned::DRAFT, Versioned::LIVE);
         }
         
@@ -63,8 +64,8 @@ class VersionedModifiedExtensionTest extends SapphireTest {
         
         
         //Change a sub object on draft
-        $subObj=$obj->SubObjs()->first();
-        $subObj->Title=$subObj->Title.' (changed)';
+        $subObj = $obj->SubObjs()->first();
+        $subObj->Title = $subObj->Title . ' (changed)';
         $subObj->write();
         
         

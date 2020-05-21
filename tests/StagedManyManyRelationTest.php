@@ -6,20 +6,21 @@ use SilverStripe\Versioned\Versioned;
 use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestObj;
 use WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj;
 
-
-class StagedManyManyRelationTest extends SapphireTest {
-    protected static $fixture_file='StagedManyManyRelationTest.yml';
-    protected static $extra_dataobjects=array(
-                                            StagedManyManyTestObj::class,
-                                            StagedManyManyTestSubObj::class
-                                        );
+class StagedManyManyRelationTest extends SapphireTest
+{
+    protected static $fixture_file = 'StagedManyManyRelationTest.yml';
+    protected static $extra_dataobjects = [
+        StagedManyManyTestObj::class,
+        StagedManyManyTestSubObj::class,
+    ];
     
     
     /**
      * Test updateManyManyComponents
      */
-    public function testUpdateManyManyComponents() {
-        $obj=$this->objFromFixture(StagedManyManyTestObj::class, 'item1');
+    public function testUpdateManyManyComponents()
+    {
+        $obj = $this->objFromFixture(StagedManyManyTestObj::class, 'item1');
         $obj->publishRecursive();
         
         
@@ -42,8 +43,9 @@ class StagedManyManyRelationTest extends SapphireTest {
     /**
      * Test Publishing
      */
-    public function testPublish() {
-        $obj=$this->objFromFixture(StagedManyManyTestObj::class, 'item2');
+    public function testPublish()
+    {
+        $obj = $this->objFromFixture(StagedManyManyTestObj::class, 'item2');
         
         
         //Make sure the items do not exist on live
@@ -71,8 +73,9 @@ class StagedManyManyRelationTest extends SapphireTest {
     /**
      * Test Unpublishing
      */
-    public function testUnpublish() {
-        $obj=$this->objFromFixture(StagedManyManyTestObj::class, 'item2');
+    public function testUnpublish()
+    {
+        $obj = $this->objFromFixture(StagedManyManyTestObj::class, 'item2');
         $obj->publishRecursive();
         
         
@@ -100,8 +103,9 @@ class StagedManyManyRelationTest extends SapphireTest {
     /**
      * Test stagesDiffer
      */
-    public function testStagesDiffer() {
-        $obj=$this->objFromFixture(StagedManyManyTestObj::class, 'item4');
+    public function testStagesDiffer()
+    {
+        $obj = $this->objFromFixture(StagedManyManyTestObj::class, 'item4');
         $obj->publishRecursive();
         
         
@@ -110,8 +114,8 @@ class StagedManyManyRelationTest extends SapphireTest {
         
         
         //Add a new item
-        $newItem=new StagedManyManyTestSubObj();
-        $newItem->Title='New Item';
+        $newItem = new StagedManyManyTestSubObj();
+        $newItem->Title = 'New Item';
         $newItem->write();
         $obj->SubObjs()->add($newItem);
         
@@ -120,4 +124,3 @@ class StagedManyManyRelationTest extends SapphireTest {
         $this->assertTrue($obj->stagesDiffer());
     }
 }
-?>
