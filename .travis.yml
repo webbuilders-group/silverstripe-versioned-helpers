@@ -2,25 +2,29 @@ language: php
 php:
   - 5.6
 
-sudo: false
+os: linux
+dist: xenial
 
 notifications:
   email:
     secure: "J2OF3+tIUVYCYUebbhOXYrLF4VVDDaX78hSRTZb06p6s1CKdn4Ey0QYBnlylducSoSDRFNk0xfcWLh6gjGQscypVYBOulA/f3qfCTHJfDn/+HMtnJNvy6Vp7QDBFSWKDUDHOa2w8WqtjcXHprRHrmga4v0AsH8DL7smoDzhkzu63fbgGJUYkkcNHb+ndENr4ahL9s1vtL5T9v0hnjLn60frdhQCvJPXs8Bl1IpjiW0FulLBAm+fNL1nv5s+hViABc8V1FYkzm6nzFcih23NnbmHdy/5vTk6vnqJEEeuctj75zWgkhNWwuiNvXAmcdEOGEQTq0C7uO+DFVPZchUW7mUM8wzBDbUJDdCHsk0VWidVEGRbj1fIis/FBBosi/3XqbPtgO99E72DtTHIU7n+EObFjCIQ7OhB9wLWWn9Anz6o6QOgowpUDJVCW9/SAt0ITo2xknVKfClYcjkE9qol4UYVdGv/0BaBS6fLpc7bCLsiqGz/4fNpGiBie75GIYUHvcOdx1gBaC9y81ihSblPj206ignOaPSD3Fm0kzvKHneysKmcVWsTKH5ZQ6er9ZrhAdRqiS61hkCaylTIe8FvvIeOgWtsLMbm8LrjRvGMn1/mjYxgUSZxnQNIXcvxWiVbBRqnPpxCVddglY6grr6BnwHGfYVAnd6uAhyqyHGYlBFI="
 
-services:
-  - mysql
-
-matrix:
+jobs:
   include:
     - php: 7.2
       env: DB=MYSQL CORE_RELEASE=4.5
+      services:
+        - mysql
     - php: 7.2
       env: DB=PGSQL CORE_RELEASE=4.5
+      services:
+        - postgresql
     - php: 7.2
       env: DB=SQLITE3 CORE_RELEASE=4.5
     - php: 5.6
       env: DB=MYSQL CORE_RELEASE=4.4
+      services:
+        - mysql
 
 before_script:
   - composer self-update || true
