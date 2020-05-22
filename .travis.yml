@@ -19,8 +19,10 @@ jobs:
       env: DB=PGSQL CORE_RELEASE=4.5
       services:
         - postgresql
-    - php: 7.2
-      env: DB=SQLITE3 CORE_RELEASE=4.5
+    - php: 7.1
+      env: DB=MYSQL CORE_RELEASE=4.4
+      services:
+        - mysql
     - php: 5.6
       env: DB=MYSQL CORE_RELEASE=4.4
       services:
@@ -32,7 +34,6 @@ before_script:
   - composer require --no-update silverstripe/recipe-cms:"^$CORE_RELEASE" --prefer-dist
   - composer require --no-update phpunit/phpunit:^5.7 --prefer-dist
   - if [[ $DB == PGSQL ]]; then composer require silverstripe/postgresql:~2.0 --prefer-dist --no-update; fi
-  - if [[ $DB == SQLITE3 ]]; then composer require silverstripe/sqlite3:~2.0 --prefer-dist --no-update; fi
   - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose
 
 script:
