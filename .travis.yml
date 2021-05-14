@@ -1,40 +1,46 @@
 language: php
 php:
-  - 7.4
+ - 7.4
 
 os: linux
 dist: xenial
+
+sudo: false
 
 notifications:
   email:
     secure: "J2OF3+tIUVYCYUebbhOXYrLF4VVDDaX78hSRTZb06p6s1CKdn4Ey0QYBnlylducSoSDRFNk0xfcWLh6gjGQscypVYBOulA/f3qfCTHJfDn/+HMtnJNvy6Vp7QDBFSWKDUDHOa2w8WqtjcXHprRHrmga4v0AsH8DL7smoDzhkzu63fbgGJUYkkcNHb+ndENr4ahL9s1vtL5T9v0hnjLn60frdhQCvJPXs8Bl1IpjiW0FulLBAm+fNL1nv5s+hViABc8V1FYkzm6nzFcih23NnbmHdy/5vTk6vnqJEEeuctj75zWgkhNWwuiNvXAmcdEOGEQTq0C7uO+DFVPZchUW7mUM8wzBDbUJDdCHsk0VWidVEGRbj1fIis/FBBosi/3XqbPtgO99E72DtTHIU7n+EObFjCIQ7OhB9wLWWn9Anz6o6QOgowpUDJVCW9/SAt0ITo2xknVKfClYcjkE9qol4UYVdGv/0BaBS6fLpc7bCLsiqGz/4fNpGiBie75GIYUHvcOdx1gBaC9y81ihSblPj206ignOaPSD3Fm0kzvKHneysKmcVWsTKH5ZQ6er9ZrhAdRqiS61hkCaylTIe8FvvIeOgWtsLMbm8LrjRvGMn1/mjYxgUSZxnQNIXcvxWiVbBRqnPpxCVddglY6grr6BnwHGfYVAnd6uAhyqyHGYlBFI="
 
-jobs:
+env:
+  - DB=MYSQL CORE_RELEASE=4.7
+
+matrix:
   include:
-    - php: 7.4
+    - php: 7.2
+      env: DB=PGSQL CORE_RELEASE=4.7
+      services:
+        - postgresql
+    - php: 7.2
       env: DB=MYSQL CORE_RELEASE=4.7
       services:
         - mysql
     - php: 7.2
-      env: DB=PGSQL CORE_RELEASE=4.6
-      services:
-        - postgresql
-    - php: 7.1
-      env: DB=MYSQL CORE_RELEASE=4.5
-      services:
-        - mysql
-    - php: 5.6
       env: DB=MYSQL CORE_RELEASE=4.5
       services:
         - mysql
 
 before_script:
+  # Init PHP
   - composer self-update || true
+  - phpenv rehash
+  - phpenv config-rm xdebug.ini
+
+  # Install composer dependencies
   - composer validate
-  - composer require --no-update silverstripe/recipe-cms:"^$CORE_RELEASE" --prefer-dist
-  - composer require --no-update phpunit/phpunit:^5.7 --prefer-dist
+  - composer require --no-update silverstripe/recipe-core:"^$CORE_RELEASE" --prefer-dist
+  - composer require --no-update phpunit/phpunit:^5.7
   - if [[ $DB == PGSQL ]]; then composer require silverstripe/postgresql:~2.0 --prefer-dist --no-update; fi
-  - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose
+  - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
   - vendor/bin/phpunit

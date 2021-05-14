@@ -103,7 +103,7 @@ class StagedManyManyRelationExtension extends DataExtension
 
 
             //Make sure the Items all exist on both stages
-            $childTable = $schema->tableName($relClass['childClass']);
+            $childTable = $schema->baseDataTable($relClass['childClass']);
             $query = SQLSelect::create('"' . Convert::raw2sql($relClass['join']) . '".*', '"' . $relClass['join'] . '"')
                 ->addInnerJoin($childTable, ' "' . Convert::raw2sql($childTable) . '"."ID"="' . Convert::raw2sql($relClass['join']) . '"."' . Convert::raw2sql($relClass['childField']) . '"')
                 ->addWhere(['"' . Convert::raw2sql($relClass['parentField']) . '"= ?' => $this->owner->ID]);
@@ -119,7 +119,7 @@ class StagedManyManyRelationExtension extends DataExtension
                 $childTable .= '_Live';
             }
 
-            $childTable = $schema->tableName($relLiveClass['childClass']);
+            $childTable = $schema->baseDataTable($relLiveClass['childClass']);
             $query = SQLSelect::create('"' . Convert::raw2sql($relLiveClass['join']) . '".*', '"' . $relLiveClass['join'] . '"')
                 ->addInnerJoin($childTable, ' "' . Convert::raw2sql($childTable) . '"."ID"="' . Convert::raw2sql($relLiveClass['join']) . '"."' . Convert::raw2sql($relLiveClass['childField']) . '"')
                 ->addWhere(['"' . Convert::raw2sql($relLiveClass['parentField']) . '"= ?' => $this->owner->ID]);
