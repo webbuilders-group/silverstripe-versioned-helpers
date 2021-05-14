@@ -25,7 +25,7 @@ matrix:
       services:
         - postgresql
     - php: 7.2
-      env: DB=MYSQL CORE_RELEASE=4.7
+      env: DB=MYSQL CORE_RELEASE=4.6
       services:
         - mysql
     - php: 7.2
