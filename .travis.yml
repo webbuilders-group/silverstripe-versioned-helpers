@@ -16,6 +16,10 @@ env:
 
 matrix:
   include:
+    - php: 7.4
+      env: DB=MYSQL CORE_RELEASE=4.7
+      services:
+        - mysql
     - php: 7.2
       env: DB=PGSQL CORE_RELEASE=4.7
       services:
