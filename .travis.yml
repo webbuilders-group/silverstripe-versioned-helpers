@@ -1,6 +1,6 @@
 language: php
 php:
-  - 5.6
+  - 7.4
 
 os: linux
 dist: xenial
@@ -11,20 +11,20 @@ notifications:
 
 jobs:
   include:
-    - php: 7.2
-      env: DB=MYSQL CORE_RELEASE=4.5
+    - php: 7.4
+      env: DB=MYSQL CORE_RELEASE=4.7
       services:
         - mysql
     - php: 7.2
-      env: DB=PGSQL CORE_RELEASE=4.5
+      env: DB=PGSQL CORE_RELEASE=4.6
       services:
         - postgresql
     - php: 7.1
-      env: DB=MYSQL CORE_RELEASE=4.4
+      env: DB=MYSQL CORE_RELEASE=4.5
       services:
         - mysql
     - php: 5.6
-      env: DB=MYSQL CORE_RELEASE=4.4
+      env: DB=MYSQL CORE_RELEASE=4.5
       services:
         - mysql
 
