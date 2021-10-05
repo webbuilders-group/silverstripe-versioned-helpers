@@ -10,26 +10,28 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyRelationExtension;
 
-class MyDataObject extends DataObject {
-    private static $many_many=array(
-                                    'Images'=>Image::class,
-                                    'Images_Live'=>Image::class
-                                );
+class MyDataObject extends DataObject
+{
+    private static $many_many = [
+        'Images' => Image::class,
+        'Images_Live' =>Image::class,
+    ];
 
-    private static $extensions=array(
-                                    Versioned::class,
-                                    StagedManyManyRelationExtension::class
-                                );
+    private static $extensions = [
+        Versioned::class,
+        StagedManyManyRelationExtension::class,
+    ];
 
-    private static $staged_many_many=array(
-                                        'Images'
-                                    );
+    private static $staged_many_many = [
+        'Images',
+    ];
 
     /**
      * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
      * @return bool
      */
-    public function stagesDiffer() {
+    public function stagesDiffer()
+    {
         return max($this->extend('stagesDiffer'));
     }
 
@@ -37,7 +39,8 @@ class MyDataObject extends DataObject {
      * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
      * @return bool
      */
-    public function isModifiedOnDraft() {
+    public function isModifiedOnDraft()
+    {
         return max($this->extend('isModifiedOnDraft'));
     }
 }
@@ -54,8 +57,9 @@ If you are duplicating DataObjects with the ``WebbuildersGroup\VersionedHelpers\
  * @param string $relation
  */
 protected function duplicateManyManyRelation($sourceObject, $destinationObject, $relation)
+{
     //If the relationship ends with "_Live" assume it's a published version of a relationship and skip if present in the config
-    if(preg_match('/^(.*?)_Live$/', $relation)==true && is_array($this->config()->staged_many_many) && in_array(pre_replace('/^(.*?)_Live$/', '$1', $relation), $this->config()->staged_many_many)) {
+    if (preg_match('/^(.*?)_Live$/', $relation)==true && is_array($this->config()->staged_many_many) && in_array(preg_replace('/^(.*?)_Live$/', '$1', $relation), $this->config()->staged_many_many)) {
         return;
     }
 

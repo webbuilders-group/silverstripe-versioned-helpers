@@ -14,7 +14,8 @@ This class does not check if it's owner differs between stages.
  * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
  * @return bool
  */
-public function stagesDiffer() {
+public function stagesDiffer()
+{
     return max($this->extend('stagesDiffer'));
 }
 
@@ -22,7 +23,8 @@ public function stagesDiffer() {
  * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
  * @return bool
  */
-public function isModifiedOnDraft() {
+public function isModifiedOnDraft()
+{
     return ($this->isOnDraft() && $this->stagesDiffer());
 }
 ```
