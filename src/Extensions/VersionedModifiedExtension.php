@@ -1,9 +1,9 @@
 <?php
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -16,7 +16,7 @@ class VersionedModifiedExtension extends DataExtension
         'isModifiedOnDraft' => 'Boolean',
         'isPublished' => 'Boolean',
     ];
-    
+
     /**
      * Compare two stages to see if they're different. Only checks the version numbers, not the actual content.
      * @return bool
@@ -24,27 +24,27 @@ class VersionedModifiedExtension extends DataExtension
     public function stagesDiffer()
     {
         $stagesAreEqual = true;
-        
+
         $ownerClass = $this->owner->ClassName;
         $owns = $this->owner->config()->get('owns');
-        
-        //Check to see if the items differ
+
+        // Check to see if the items differ
         foreach ($owns as $relation) {
             $relClass = $this->owner->getSchema()->hasManyComponent($ownerClass, $relation);
             if (!$relClass) {
                 continue;
             }
-            
+
             $baseClass = DataObject::getSchema()->baseDataClass($relClass);
-            
+
             $isPolymorphic = false;
             $parentField = $this->owner->getSchema()->getRemoteJoinField($ownerClass, $relation, 'has_many', $isPolymorphic);
             if (!$parentField) {
                 continue;
             }
-            
-            
-            //For Polymorphic Parent relationships we need to amend the query a bit more
+
+
+            // For Polymorphic Parent relationships we need to amend the query a bit more
             if ($isPolymorphic) {
                 $filters = [
                     $parentField . 'ID' => $this->owner->ID,
@@ -55,21 +55,21 @@ class VersionedModifiedExtension extends DataExtension
                     $parentField => $this->owner->ID,
                 ];
             }
-            
-            
-            //Make sure the Items all exist on both stages
+
+
+            // Make sure the Items all exist on both stages
             $stageItems = Versioned::get_by_stage($relClass, Versioned::DRAFT)->filter($filters)->column('ID');
             $liveItems = Versioned::get_by_stage($relClass, Versioned::LIVE)->filter($filters)->column('ID');
-            
+
             $diff = array_merge(array_diff($stageItems, $liveItems), array_diff($liveItems, $stageItems));
             if (count($diff) > 0) {
                 $stagesAreEqual = false;
             }
-            
-            //Check each item to see if it is modified
+
+            // Check each item to see if it is modified
             if ($stagesAreEqual) {
                 $hasDifferMethod = singleton($relClass)->hasMethod('stagesDiffer');
-                    
+
                 $table1 = DataObject::getSchema()->tableName($baseClass);
                 $table2 = DataObject::getSchema()->tableName($baseClass) . '_' . Versioned::LIVE;
                 foreach ($stageItems as $itemID) {
@@ -88,21 +88,21 @@ class VersionedModifiedExtension extends DataExtension
                             [$itemID]
                         )->value();
                     }
-                    
+
                     if (!$stagesAreEqual) {
                         break;
                     }
                 }
             }
-            
+
             if (!$stagesAreEqual) {
                 break;
             }
         }
-        
+
         return !$stagesAreEqual;
     }
-    
+
     /**
      * Wrapper for VersionedModifiedExtension::stagesDiffer()
      * @return bool

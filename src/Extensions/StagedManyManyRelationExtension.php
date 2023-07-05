@@ -2,14 +2,14 @@
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
-use SilverStripe\ORM\RelationList;
 use SilverStripe\ORM\Queries\SQLDelete;
 use SilverStripe\ORM\Queries\SQLSelect;
+use SilverStripe\ORM\RelationList;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -102,7 +102,7 @@ class StagedManyManyRelationExtension extends DataExtension
             }
 
 
-            //Make sure the Items all exist on both stages
+            // Make sure the Items all exist on both stages
             $childTable = $schema->baseDataTable($relClass['childClass']);
             $query = SQLSelect::create('"' . Convert::raw2sql($relClass['join']) . '".*', '"' . $relClass['join'] . '"')
                 ->addInnerJoin($childTable, ' "' . Convert::raw2sql($childTable) . '"."ID"="' . Convert::raw2sql($relClass['join']) . '"."' . Convert::raw2sql($relClass['childField']) . '"')
@@ -114,7 +114,7 @@ class StagedManyManyRelationExtension extends DataExtension
 
             $stageItems = iterator_to_array($query->execute());
 
-            //If Versioned is present change the child table to _Live
+            // If Versioned is present change the child table to _Live
             if ($relClass['childClass']::has_extension(Versioned::class)) {
                 $childTable .= '_Live';
             }
@@ -139,7 +139,7 @@ class StagedManyManyRelationExtension extends DataExtension
             }
 
 
-            //Differ the extra fields if there are any
+            // Differ the extra fields if there are any
             if ($stagesAreEqual) {
                 $stageExtra = $schema->manyManyExtraFieldsForComponent($ownerClass, $relation);
                 $liveExtra = $schema->manyManyExtraFieldsForComponent($ownerClass, $relationLive);
@@ -216,10 +216,10 @@ class StagedManyManyRelationExtension extends DataExtension
 
             $list = $this->owner->$relLiveName();
 
-            //Remove all from this relationship
+            // Remove all from this relationship
             $filter = $this->foreignIDFilter($list);
             if (is_array($filter)) {
-                //Delete regardless of whether the original objects exist or not
+                // Delete regardless of whether the original objects exist or not
                 $delete = SQLDelete::create('"' . $list->getJoinTable() . '"');
                 $delete->addWhere($filter);
 
@@ -275,10 +275,10 @@ class StagedManyManyRelationExtension extends DataExtension
 
                 $list = $this->owner->$relName();
 
-                //Remove all from this relationship
+                // Remove all from this relationship
                 $filter = $this->foreignIDFilter($list);
                 if (is_array($filter)) {
-                    //Delete regardless of whether the original objects exist or not
+                    // Delete regardless of whether the original objects exist or not
                     $delete = SQLDelete::create('"' . $list->getJoinTable() . '"');
                     $delete->addWhere($filter);
 
@@ -322,7 +322,7 @@ class StagedManyManyRelationExtension extends DataExtension
                 continue;
             }
 
-            //Remove all from this relationship
+            // Remove all from this relationship
             $list = $this->owner->$relLiveName();
             $filter = $this->foreignIDFilter($list);
             if (!is_array($filter)) {
@@ -330,7 +330,7 @@ class StagedManyManyRelationExtension extends DataExtension
             }
 
 
-            //Delete regardless of whether the original objects exist or not
+            // Delete regardless of whether the original objects exist or not
             $delete = SQLDelete::create('"' . $list->getJoinTable() . '"');
             $delete->addWhere($filter);
 

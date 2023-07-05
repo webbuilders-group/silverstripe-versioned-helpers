@@ -9,22 +9,22 @@ use WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyRelationExtension
 class StagedManyManyTestObj extends DataObject implements TestOnly
 {
     private static $db = [
-                            'Title' => 'Varchar(50)',
-                        ];
-    
+        'Title' => 'Varchar(50)',
+    ];
+
     private static $many_many = [
-                                'SubObjs' => StagedManyManyTestSubObj::class,
-                                'SubObjs_Live' => StagedManyManyTestSubObj::class,
-                            ];
-    
+        'SubObjs' => StagedManyManyTestSubObj::class,
+        'SubObjs_Live' => StagedManyManyTestSubObj::class,
+    ];
+
     private static $extensions = [
-                                    Versioned::class,
-                                    StagedManyManyRelationExtension::class
-                                ];
-    
+        Versioned::class,
+        StagedManyManyRelationExtension::class
+    ];
+
     private static $staged_many_many = [
-                                            'SubObjs'
-                                        ];
-    
+        'SubObjs'
+    ];
+
     private static $table_name = 'StagedManyManyTestObj';
 }

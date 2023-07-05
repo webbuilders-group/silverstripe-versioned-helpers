@@ -7,8 +7,8 @@ use SilverStripe\ORM\DataObject;
 class StagedManyManyTestSubObj extends DataObject implements TestOnly
 {
     private static $db = [
-                            'Title' => 'Varchar(50)',
-                        ];
-    
+        'Title' => 'Varchar(50)',
+    ];
+
     private static $table_name = 'StagedManyManyTestSubObj';
 }

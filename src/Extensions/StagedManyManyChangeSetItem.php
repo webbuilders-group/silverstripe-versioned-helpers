@@ -22,13 +22,13 @@ class StagedManyManyChangeSetItem extends DataExtension
      */
     public function updateChangeType(&$type, $draftVersion, $liveVersion)
     {
-        //Make sure we have a change type of none if not do nothing
+        // Make sure we have a change type of none if not do nothing
         if ($type != ChangeSetItem::CHANGE_NONE) {
             return;
         }
 
 
-        //Make sure the owner has the StagedManyManyRelationExtension and has items before we proceed
+        // Make sure the owner has the StagedManyManyRelationExtension and has items before we proceed
         $object = $this->owner->Object();
         if (!empty($object) && $object !== false && $object->exists() && $object->hasExtension(StagedManyManyRelationExtension::class)) {
             if (($relations = $object->config()->staged_many_many) && $this->objectStagesDiffer($object, $relations)) {
@@ -80,7 +80,7 @@ class StagedManyManyChangeSetItem extends DataExtension
             }
 
 
-            //Make sure the Items all exist on both stages
+            // Make sure the Items all exist on both stages
             $childTable = $schema->baseDataTable($relClass['childClass']);
             $query = SQLSelect::create('"' . Convert::raw2sql($relClass['join']) . '".*', '"' . $relClass['join'] . '"')
                 ->addInnerJoin($childTable, '"' . Convert::raw2sql($childTable) . '"."ID"="' . Convert::raw2sql($relClass['join']) . '"."' . Convert::raw2sql($relClass['childField']) . '"')
@@ -91,7 +91,7 @@ class StagedManyManyChangeSetItem extends DataExtension
 
             $stageItems = iterator_to_array($query->execute());
 
-            //If Versioned is present change the child table to _Live
+            // If Versioned is present change the child table to _Live
             if ($relClass['childClass']::has_extension(Versioned::class)) {
                 $childTable .= '_Live';
             }
@@ -115,7 +115,7 @@ class StagedManyManyChangeSetItem extends DataExtension
             }
 
 
-            //Differ the extra fields if there are any
+            // Differ the extra fields if there are any
             if ($stagesAreEqual) {
                 $stageExtra = $schema->manyManyExtraFieldsForComponent($ownerClass, $relation);
                 $liveExtra = $schema->manyManyExtraFieldsForComponent($ownerClass, $relationLive);

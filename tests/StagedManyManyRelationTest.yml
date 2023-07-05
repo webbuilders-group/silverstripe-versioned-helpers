@@ -1,24 +1,24 @@
 WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj:
-    sub1:
-        Title: "Sub Object 1"
-    sub2:
-        Title: "Sub Object 2"
-    sub3:
-        Title: "Sub Object 3"
-    sub4:
-        Title: "Sub Object 4"
+  sub1:
+    Title: "Sub Object 1"
+  sub2:
+    Title: "Sub Object 2"
+  sub3:
+    Title: "Sub Object 3"
+  sub4:
+    Title: "Sub Object 4"
 
 
 WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestObj:
-    item1:
-        Title: "Test Object 1"
-        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub1
-    item2:
-        Title: "Test Object 2"
-        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub2
-    item3:
-        Title: "Test Object 3"
-        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub3
-    item4:
-        Title: "Test Object 4"
-        SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub4
+  item1:
+    Title: "Test Object 1"
+    SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub1
+  item2:
+    Title: "Test Object 2"
+    SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub2
+  item3:
+    Title: "Test Object 3"
+    SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub3
+  item4:
+    Title: "Test Object 4"
+    SubObjs: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\StagedManyManyTestSubObj.sub4

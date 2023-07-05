@@ -8,16 +8,16 @@ use SilverStripe\Versioned\Versioned;
 class VersionedModifiedTestSubObj extends DataObject implements TestOnly
 {
     private static $db = [
-                            'Title' => 'Varchar(50)',
-                        ];
-    
+        'Title' => 'Varchar(50)',
+    ];
+
     private static $has_one = [
-                            'Parent' => VersionedModifiedTestObj::class,
-                        ];
-    
+        'Parent' => VersionedModifiedTestObj::class,
+    ];
+
     private static $extensions = [
-                                    Versioned::class
-                                ];
-    
+        Versioned::class
+    ];
+
     private static $table_name = 'VersionedModifiedTestSubObj';
 }

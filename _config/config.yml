@@ -1,8 +1,8 @@
 ---
 Name: versioned_helpers
 After:
-    - "framework/*"
+  - "framework/*"
 ---
 SilverStripe\Versioned\ChangeSetItem:
-    extensions:
-        - 'WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyChangeSetItem'
+  extensions:
+    - 'WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyChangeSetItem'

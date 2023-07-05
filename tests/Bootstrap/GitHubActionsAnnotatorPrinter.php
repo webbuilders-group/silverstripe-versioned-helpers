@@ -90,7 +90,7 @@ class GitHubActionsAnnotatorPrinter extends DefaultResultPrinter
     {
         $relative = str_replace(getcwd() . DIRECTORY_SEPARATOR, '', $path);
 
-        //Normalize
+        // Normalize
         $relative = str_replace('\\', '/', $relative);
 
         return $relative;

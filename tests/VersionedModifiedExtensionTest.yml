@@ -1,14 +1,14 @@
 WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj:
-    item1:
-        Title: "Test Object 1"
-    item2:
-        Title: "Test Object 2"
+  item1:
+    Title: "Test Object 1"
+  item2:
+    Title: "Test Object 2"
 
 
 WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestSubObj:
-    sub1:
-        Title: "Sub Object 1"
-        Parent: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj.item1
-    sub2:
-        Title: "Sub Object 2"
-        Parent: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj.item2
+  sub1:
+    Title: "Sub Object 1"
+    Parent: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj.item1
+  sub2:
+    Title: "Sub Object 2"
+    Parent: =>WebbuildersGroup\VersionedHelpers\Tests\TestObjects\VersionedModifiedTestObj.item2
