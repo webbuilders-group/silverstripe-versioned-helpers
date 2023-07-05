@@ -1,6 +1,6 @@
 SilverStripe Versioned Helpers
 =================
-[![Build Status](https://travis-ci.org/webbuilders-group/silverstripe-versioned-helpers.png?branch=master)](https://travis-ci.org/webbuilders-group/silverstripe-versioned-helpers)
+[![CI](https://github.com/webbuilders-group/silverstripe-versioned-helpers/actions/workflows/ci.yml/badge.svg)](https://github.com/webbuilders-group/silverstripe-versioned-helpers/actions/workflows/ci.yml)
 
 Provides a number of helpful extensions for working with custom data objects that are versioned or working with versioned relationships of SiteTree decedents.
 
@@ -8,7 +8,7 @@ Provides a number of helpful extensions for working with custom data objects tha
 * Ed Chipman ([UndefinedOffset](https://github.com/UndefinedOffset))
 
 ## Requirements
-* SilverStripe Framework 4.1+
+* SilverStripe Framework 4.1+ | 5.0+
 
 ## Recommended
 * [SilverStripe GridField Deleted Items](https://github.com/webbuilders-group/silverstripe-gridfield-deleted-items): Provides a series of components that allows you to view versioned objects that have been deleted from the draft site.
