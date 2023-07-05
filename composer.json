@@ -24,5 +24,11 @@
     },
     "suggest": {
         "webbuilders-group/silverstripe-gridfield-deleted-items": "Provides a series of components that allows you to view versioned objects that have been deleted from the draft site."
+    },
+    "autoload": {
+        "psr-4": {
+            "WebbuildersGroup\\VersionedHelpers\\": "src/",
+            "WebbuildersGroup\\VersionedHelpers\\Tests\\": "tests/"
+        }
     }
 }
