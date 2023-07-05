@@ -191,7 +191,7 @@ jobs:
         with:
           php-version: ${{ env.php_version }}
           extensions: ${{ env.php_extensions }}
-          key: php74-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
+          key: php80-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
         uses: actions/cache@v3
@@ -227,7 +227,6 @@ jobs:
           rm composer.json
           composer self-update --ansi || true
           if [[ $GITHUB_ACCESS_TOKEN ]]; then composer config --ansi -g github-oauth.github.com $GITHUB_ACCESS_TOKEN; fi
-          composer require silverstripe/versioned 1.11.*
           composer install --verbose --no-interaction --no-progress --no-suggest --optimize-autoloader --ansi
           mkdir artifacts
 
