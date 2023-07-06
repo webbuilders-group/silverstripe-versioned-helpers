@@ -18,7 +18,6 @@ jobs:
   silverstripe_5_php81:
     name: "Silverstripe 5.0 | PHP 8.1"
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     env:
       php_version: 8.1
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
@@ -97,7 +96,6 @@ jobs:
   silverstripe_411_php80:
     name: "Silverstripe 4.11 | PHP 8.0"
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     env:
       php_version: 8.0
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
@@ -176,7 +174,6 @@ jobs:
   phpcs:
     name: "PHP_CodeSniffer"
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[ci skip]')"
     env:
       php_version: 8.0
       php_extensions: ctype, dom, fileinfo, hash, intl, mbstring, session, simplexml, tokenizer, xml, pdo, mysqli, gd, zip
