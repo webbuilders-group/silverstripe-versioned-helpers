@@ -1,7 +1,8 @@
 ---
 Name: versioned_helpers
 After:
-  - "silverstripe/framework/*"
+  - "silverstripe/framework#*"
+  - "silverstripe/versioned#*"
 ---
 SilverStripe\Versioned\ChangeSetItem:
   extensions:
