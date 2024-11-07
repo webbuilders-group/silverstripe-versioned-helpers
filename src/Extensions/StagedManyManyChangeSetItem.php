@@ -2,7 +2,7 @@
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\Versioned\ChangeSetItem;
@@ -12,7 +12,7 @@ use SilverStripe\Versioned\Versioned;
  * Class \WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyChangeSetItem
  *
  */
-class StagedManyManyChangeSetItem extends DataExtension
+class StagedManyManyChangeSetItem extends Extension
 {
     /**
      * Updates the change type if the staged_many_many relationships differ

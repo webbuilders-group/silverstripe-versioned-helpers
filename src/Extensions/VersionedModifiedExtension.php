@@ -1,7 +1,7 @@
 <?php
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Versioned\Versioned;
@@ -10,7 +10,7 @@ use SilverStripe\Versioned\Versioned;
  * Class \WebbuildersGroup\VersionedHelpers\Extensions\VersionedModifiedExtension
  *
  */
-class VersionedModifiedExtension extends DataExtension
+class VersionedModifiedExtension extends Extension
 {
     private static $casting = [
         'isModifiedOnDraft' => 'Boolean',

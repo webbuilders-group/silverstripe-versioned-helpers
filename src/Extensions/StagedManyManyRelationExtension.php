@@ -2,7 +2,7 @@
 namespace WebbuildersGroup\VersionedHelpers\Extensions;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
@@ -16,7 +16,7 @@ use SilverStripe\Versioned\Versioned;
  * Class \WebbuildersGroup\VersionedHelpers\Extensions\StagedManyManyRelationExtension
  *
  */
-class StagedManyManyRelationExtension extends DataExtension
+class StagedManyManyRelationExtension extends Extension
 {
     private static $disabled = false;
 
