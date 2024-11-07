@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP Extension Cache
         id: cache-env
@@ -45,7 +45,7 @@ jobs:
           key: php81-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -65,7 +65,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-ss5-php81-${{ hashFiles('**/composer.json') }}-${{ hashFiles('.github/workflows/ci.yml') }}
@@ -112,7 +112,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP Extension Cache
         id: cache-env
@@ -123,7 +123,7 @@ jobs:
           key: php80-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -143,7 +143,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-ss413-php80-${{ hashFiles('**/composer.json') }}-${{ hashFiles('.github/workflows/ci.yml') }}
@@ -190,7 +190,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP Extension Cache
         id: cache-env
@@ -201,7 +201,7 @@ jobs:
           key: php74-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -221,7 +221,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-ss413-php74-${{ hashFiles('**/composer.json') }}-${{ hashFiles('.github/workflows/ci.yml') }}
@@ -255,7 +255,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP Extension Cache
         id: cache-env
@@ -266,7 +266,7 @@ jobs:
           key: php80-ext-cache-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Cache PHP Extensions
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.cache-env.outputs.dir }}
           key: ${{ steps.cache-env.outputs.key }}
@@ -286,7 +286,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-phpcs-${{ hashFiles('.github/workflows/ci.yml') }}
