@@ -12,11 +12,11 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~4.1|~5.0",
-        "silverstripe/versioned": "~1.1|~2.0"
+        "silverstripe/framework": "~4.1|~5.0|~6.0",
+        "silverstripe/versioned": "~1.1|~2.0|~3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~9.5"
+        "phpunit/phpunit": "~9.5|~11.3"
     },
     "support": {
         "issues": "https://github.com/webbuilders-group/silverstripe-versioned-helpers/issues"

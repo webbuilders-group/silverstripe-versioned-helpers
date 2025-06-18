@@ -197,7 +197,7 @@ class StagedManyManyRelationExtension extends Extension
      * Handles publishing the versioned many_many relationships
      * @param DataObjectInterface $original Original object being published
      */
-    public function onAfterPublish(DataObjectInterface $original = null)
+    public function onAfterPublish(?DataObjectInterface $original = null)
     {
         self::$disabled = true;
 

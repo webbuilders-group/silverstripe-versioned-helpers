@@ -8,7 +8,7 @@ Provides a number of helpful extensions for working with custom data objects tha
 * Ed Chipman ([UndefinedOffset](https://github.com/UndefinedOffset))
 
 ## Requirements
-* SilverStripe Framework 4.1+ | 5.0+
+* SilverStripe Framework ~4.1|~5.0|~6.0
 
 ## Recommended
 * [SilverStripe GridField Deleted Items](https://github.com/webbuilders-group/silverstripe-gridfield-deleted-items): Provides a series of components that allows you to view versioned objects that have been deleted from the draft site.
