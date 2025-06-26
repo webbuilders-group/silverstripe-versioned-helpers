@@ -19,10 +19,15 @@ class VersionedModifiedExtension extends Extension
 
     /**
      * Compare two stages to see if they're different. Only checks the version numbers, not the actual content.
-     * @return bool
+     * @param bool $stagesDiffer Whether the stages differ or not
      */
-    public function stagesDiffer()
+    public function updateStagesDiffer(&$stagesDiffer)
     {
+        // If the stages already differ stop
+        if ($stagesDiffer) {
+            return;
+        }
+
         $stagesAreEqual = true;
 
         $ownerClass = $this->owner->ClassName;
@@ -100,15 +105,6 @@ class VersionedModifiedExtension extends Extension
             }
         }
 
-        return !$stagesAreEqual;
-    }
-
-    /**
-     * Wrapper for VersionedModifiedExtension::stagesDiffer()
-     * @return bool
-     */
-    public function isModifiedOnDraft()
-    {
-        return $this->stagesDiffer();
+        $stagesDiffer = !$stagesAreEqual;
     }
 }

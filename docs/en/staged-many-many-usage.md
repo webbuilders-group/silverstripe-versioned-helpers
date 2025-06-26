@@ -25,24 +25,6 @@ class MyDataObject extends DataObject
     private static $staged_many_many = [
         'Images',
     ];
-
-    /**
-     * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
-     * @return bool
-     */
-    public function stagesDiffer()
-    {
-        return max($this->extend('stagesDiffer'));
-    }
-
-    /**
-     * Compares current draft with live version, and returns true if these versions differ, meaning there have been unpublished changes to the draft site.
-     * @return bool
-     */
-    public function isModifiedOnDraft()
-    {
-        return max($this->extend('isModifiedOnDraft'));
-    }
 }
 ```
 

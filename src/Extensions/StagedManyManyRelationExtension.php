@@ -66,10 +66,15 @@ class StagedManyManyRelationExtension extends Extension
 
     /**
      * Compare two stages to see if they're different. Only checks the ID's match, not the actual content.
-     * @return bool
+     * @param bool $stagesDiffer Whether the stages differ or not
      */
-    public function stagesDiffer()
+    public function updateStagesDiffer(&$stagesDiffer)
     {
+        // If the stages already differ stop
+        if ($stagesDiffer) {
+            return;
+        }
+
         self::$disabled = true;
 
         $stagesAreEqual = true;
@@ -170,16 +175,7 @@ class StagedManyManyRelationExtension extends Extension
 
         self::$disabled = false;
 
-        return !$stagesAreEqual;
-    }
-
-    /**
-     * Wrapper for StagedManyManyRelationExtension::stagesDiffer()
-     * @return bool
-     */
-    public function isModifiedOnDraft()
-    {
-        return $this->stagesDiffer();
+        $stagesDiffer = !$stagesAreEqual;
     }
 
     /**
